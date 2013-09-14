@@ -11,16 +11,77 @@
         <!--
         <fading max_range="3500"/>
         -->
-        
-        <layout crop_features="true" tile_size_factor="15">
-            <level max_range="500000"/>
+
+        <layout>
+            <tile_size_factor>15.0</tile_size_factor>
+            <crop_features>true</crop_features>
+            <level name="blue" max_range="100000">
+               <selector class="blue">
+                  <query>
+                     <expr>LEGEND = 'BL'</expr>
+                  </query>
+               </selector>
+            </level>
+            <level name="street" max_range="100000">
+               <selector class="red">
+                  <query>
+                     <expr>LEGEND = 'RD'</expr>
+                  </query>
+               </selector>
+            </level>
+            <level name="street" max_range="100000">
+               <selector class="green">
+                  <query>
+                     <expr>LEGEND = 'GR'</expr>
+                  </query>
+               </selector>
+            </level>
+            <level name="street" max_range="100000">
+               <selector class="red">
+                  <query>
+                     <expr>LEGEND = 'RD'</expr>
+                  </query>
+               </selector>
+            </level>
         </layout>
         
 
         <styles>
             <style type="text/css">
-                commareas {
+                blue {
+                    stroke:                       #0000ff;
+                    stroke-width:                 3;
+                    altitude-clamping:            terrain;
+                    altitude-technique:           gpu;
+                }
+            </style>
+            <style type="text/css">
+                red {
+                    stroke:                       #ff0000;
+                    stroke-width:                 3;
+                    altitude-clamping:            terrain;
+                    altitude-technique:           gpu;
+                }
+            </style>
+            <style type="text/css">
+                green {
+                    stroke:                       #00ff00;
+                    stroke-width:                 3;
+                    altitude-clamping:            terrain;
+                    altitude-technique:           gpu;
+                }
+            </style>
+            <style type="text/css">
+                yellow {
                     stroke:                       #ffff00;
+                    stroke-width:                 3;
+                    altitude-clamping:            terrain;
+                    altitude-technique:           gpu;
+                }
+            </style>
+            <style type="text/css">
+                white {
+                    stroke:                       #000000;
                     stroke-width:                 3;
                     altitude-clamping:            terrain;
                     altitude-technique:           gpu;
