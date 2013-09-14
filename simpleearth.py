@@ -19,6 +19,18 @@ wgs84_e2 = 0.0066943799901975848
 wgs84_a2 = wgs84_a**2 #to speed things up a bit
 wgs84_b2 = wgs84_b**2
 
+def llh2ecef(lat, lon, alt):
+    lat *= (math.pi / 180.0)
+    lon *= (math.pi / 180.0)
+    
+    n = lambda x: wgs84_a / math.sqrt(1 - wgs84_e2*(math.sin(x)**2))
+    
+    x = (n(lat) + alt)*math.cos(lat)*math.cos(lon)
+    y = (n(lat) + alt)*math.cos(lat)*math.sin(lon)
+    z = (n(lat)*(1-wgs84_e2)+alt)*math.sin(lat)
+    
+    return [x,y,z]
+
 TYPE = set(["KIDNAPPING",
 "PUBLIC INDECENCY",
 "PUBLIC PEACE VIOLATION",
@@ -77,87 +89,88 @@ class community:
 	def watchme(self):
 		print ("watching community %s" %(self.name))
 
-comm = []
+comm = [None]*100
 
-comm.insert()
+comm[1] = community("Rogers Park", 42.01, -87.67)
+comm[2] = community("West Ridge", 42, -87.69)
+comm[3] = community("Uptown", 41.97, -87.66)
+comm[4] = community("Lincoln Square", 41.97, -87.69)
+comm[9] = community("Edison Park", 42.01, -87.81)
+comm[10] = community("Norwood Park", 41.98, -87.8)
+comm[11] = community("Jefferson Park", 41.98, -87.77)
+comm[12] = community("Forest Glen", 41.983333, -87.75)
+comm[13] = community("North Park", 41.95, -87.68)
+comm[14] = community("Albany Park", 41.97, -87.72)
+comm[76] = community("O'Hare", 42, -87.92)
+comm[77] = community("Edgewater", 41.99, -87.66)
+comm[15] = community("Portage Park", 41.95, -87.76)
+comm[16] = community("Irving Park", 41.95, -87.73)
+comm[17] = community("Dunning", 41.95, -87.81)
+comm[18] = community("Montclare", 41.93, -87.8)
+comm[19] = community("Belmont Cragin", 41.93, -87.76)
+comm[20] = community("Hermosa", 41.92, -87.73)
+comm[5] = community("North Center", 41.95, -87.68)
+comm[6] = community("Lake View", 41.94352, -87.654102)
+comm[7] = community("Lincoln Park", 41.92, -87.65)
+comm[21] = community("Avondale", 41.94, -87.71)
+comm[22] = community("Logan Square", 41.928333, -87.706667)
+comm[23] = community("Humboldt Park", 41.902809, -87.720886)
+comm[24] = community("West Town", 41.9, -87.68)
+comm[25] = community("Austin", 41.9, -87.76)
+comm[26] = community("West Garfield Park", 41.88, -87.73)
+comm[27] = community("East Garfield Park", 41.88, -87.7)
+comm[28] = community("Near West Side", 41.87, -87.67)
+comm[29] = community("North Lawndale", 41.86, -87.71)
+comm[30] = community("South Lawndale", 41.85, -87.71)
+comm[31] = community("Lower West Side", 41.85, -87.66)
+comm[8] =  community("Near North Side", 41.9, -87.63)
+comm[32] = community("Loop", 41.883333, -87.633333)
+comm[33] = community("Near South Side", 41.85, -87.62)
+comm[34] = community("Armour Square", 41.833333, -87.633333)
+comm[35] = community("Douglas", 41.83, -87.62)
+comm[36] = community("Oakland", 41.82, -87.6)
+comm[37] = community("Fuller Park", 41.81, -87.626667)
+comm[38] = community("Grand Boulevard", 41.81, -87.62)
+comm[39] = community("Kenwood", 41.81, -87.6)
+comm[40] = community("Washington Park", 41.79, -87.62)
+comm[41] = community("Hyde Park", 41.79, -87.62)
+comm[42] = community("Woodlawn", 41.78, -87.6)
+comm[43] = community("South Shore", 41.76, -87.58)
+comm[60] = community("Bridgeport", 41.84, -87.65)
+comm[69] = community("Greater Grand Crossing", 41.76, -87.61)
+comm[56] = community("Garfield Ridge", 41.816667, -87.76)
+comm[57] = community("Archer Heights", 41.81, -87.73)
+comm[58] = community("Brighton Park", 41.82, -87.7)
+comm[59] = community("McKinley Park", 41.83, -87.67)
+comm[61] = community("New City", 41.81, -87.66)
+comm[62] = community("West Elsdon", 41.79, -87.72)
+comm[63] = community("Gage Park", 41.79, -87.69)
+comm[64] = community("Clearing", 41.78, -87.76)
+comm[65] = community("West Lawn", 41.77, -87.72)
+comm[66] = community("Chicago Lawn", 41.77, -87.69)
+comm[67] = community("West Englewood", 41.78, -87.67)
+comm[68] = community("Englewood", 41.779786, -87.644778)
+comm[70] = community("Ashburn", 41.75, -87.71)
+comm[71] = community("Auburn Gresham", 41.74, -87.66)
+comm[72] = community("Beverly", 41.71, -87.68)
+comm[73] = community("Washington Heights", 41.72, -87.65)
+comm[74] = community("Mount Greenwood", 41.7, -87.71)
+comm[75] = community("Morgan Park", 41.69, -87.67)
+comm[44] = community("Chatham", 41.74, -87.611667)
+comm[45] = community("Avalon Park", 41.75, -87.59)
+comm[46] = community("South Chicago", 41.74, -87.55)
+comm[47] = community("Burnside", 41.73, -87.6)
+comm[48] = community("Calumet Heights", 41.728333, -87.579722)
+comm[49] = community("Roseland", 41.71, -87.62)
+comm[50] = community("Pullman", 41.71, -87.62)
+comm[51] = community("South Deering", 41.71, -87.56)
+comm[52] = community("East Side", 41.7, -87.56)
+comm[53] = community("West Pullman", 41.68, -87.63)
+comm[54] = community("Riverdale", 41.66, -87.61)
+comm[55] = community("Hegewisch", 41.66, -87.55)
 
-comm.insert(1, community("Rogers Park", 42.01, -87.67))
-comm.insert(2, community("West Ridge", 42, -87.69))
-comm.insert(3, community("Uptown", 41.97, -87.66))
-comm.insert(4, community("Lincoln Square", 41.97, -87.69))
-comm.insert(9, community("Edison Park", 42.01, -87.81))
-comm.insert(10, community("Norwood Park", 41.98, -87.8))
-comm.insert(11, community("Jefferson Park", 41.98, -87.77))
-comm.insert(12, community("Forest Glen", 41.983333, -87.75))
-comm.insert(13, community("North", 41.95, -87.68))
-comm.insert(14, community("Albany Park", 41.97, -87.72))
-comm.insert(76, community("O'Hare", 42, -87.92))
-comm.insert(77, community("Edgewater", 41.99, -87.66))
-comm.insert(15, community("Portage Park", 41.95, -87.76))
-comm.insert(16, community("Irving Park", 41.95, -87.73))
-comm.insert(17, community("Dunning", 41.95, -87.81))
-comm.insert(18, community("Montclare", 41.93, -87.8
-comm.insert(19, community("Belmont Cragin", 41.93, -87.76
-comm.insert(20, community("Hermosa", 41.92, -87.73
-comm.insert(5 , community("North Center", 41.95, -87.68
-comm.insert(6 , community("Lake View", 41.94352, -87.654102
-comm.insert(7, community("Lincoln Park", 41.92, -87.65
-comm.insert(21, community("Avondale", 41.94, -87.71
-comm.insert(22, community("Logan Square", 41.928333, -87.706667
-comm.insert(23, community("Humboldt Park", 41.902809, -87.720886
-comm.insert(24, community("West Town", 41.9, -87.68
-comm.insert(25, community("Austin", 41.9, -87.76
-comm.insert(26, community("West Garfield Park", 41.88, -87.73
-comm.insert(27, community("East Garfield Park", 41.88, -87.7
-comm.insert(28, community("Near West Side 41.87, -87.67
-comm.insert(29, community("North Lawndale 41.86, -87.71
-comm.insert(30, community("South Lawndale 41.85, -87.71
-comm.insert(31, community("Lower West Side 41.85, -87.66
-comm.insert(08 , community("Near North Side 41.9, -87.63
-comm.insert(32, community("Loop
-comm.insert(33, community("Near South Side 41.85, -87.62
-comm.insert(34, community("Armour Square 41.833333, -87.633333
-comm.insert(35, community("Douglas 41.83, -87.62
-comm.insert(36, community("Oakland 41.82, -87.6
-comm.insert(37, community("Fuller Park 41.81, -87.626667
-comm.insert(38, community("Grand Boulevard 41.81, -87.62
-comm.insert(39, community("Kenwood 41.81, -87.6
-comm.insert(40, community("Washington Park 41.79, -87.62
-comm.insert(41, community("Hyde Park 41.79, -87.62
-comm.insert(42, community("Woodlawn 41.78, -87.6
-comm.insert(43, community("South Shore 41.76, -87.58
-comm.insert(60, community("Bridgeport 41.84, -87.65
-comm.insert(69, community("Greater Grand Crossing 41.76, -87.61
-comm.insert(56, community("Garfield Ridge 41.816667, -87.76
-comm.insert(57, community("Archer Heights 41.81, -87.73
-comm.insert(58, community("Brighton Park 41.82, -87.7
-comm.insert(59, community("McKinley Park 41.83, -87.67
-comm.insert(61, community("New City 41.81, -87.66
-comm.insert(62, community("West Elsdon 41.79, -87.72
-comm.insert(63, community("Gage Park 41.79, -87.69
-comm.insert(64, community("Clearing 41.78, -87.76
-comm.insert(65, community("West Lawn 41.77, -87.72
-comm.insert(66, community("Chicago Lawn 41.77, -87.69
-comm.insert(67, community("West Englewood 41.78, -87.67
-comm.insert(68, community("Englewood 41.779786, -87.644778
-comm.insert(70, community("Ashburn 41.75, -87.71
-comm.insert(71, community("Auburn Gresham 41.74, -87.66
-comm.insert(72, community("Beverly 41.71, -87.68
-comm.insert(73, community("Washington Heights 41.72, -87.65
-comm.insert(74, community("Mount Greenwood 41.7, -87.71
-comm.insert(75, community("Morgan Park 41.69, -87.67
-comm.insert(44, community("Chatham 41.74, -87.611667
-comm.insert(45, community("Avalon Park 41.75, -87.59
-comm.insert(46, community("South Chicago 41.74, -87.55
-comm.insert(47, community("Burnside 41.73, -87.6
-comm.insert(48, community("Calumet Heights 41.728333, -87.579722
-comm.insert(49, community("Roseland 41.71, -87.62
-comm.insert(50, community("Pullman 41.71, -87.62
-comm.insert(51, community("South Deering 41.71, -87.56
-comm.insert(52, community("East Side 41.7, -87.56
-comm.insert(53, community("West Pullman 41.68, -87.63
-comm.insert(54, community("Riverdale 41.66, -87.61
-comm.insert(55,"Hegewisch 41.66, -87.55
+for i in range(10,77):
+	print i,comm[i].name
 
 ##############################################################################################################
 # CREATE MENUS
@@ -442,18 +455,6 @@ def getPosition(lat, lon, height):
 
 	return pos
 
-def llh2ecef(lat, lon, alt):
-    lat *= (math.pi / 180.0)
-    lon *= (math.pi / 180.0)
-    
-    n = lambda x: wgs84_a / math.sqrt(1 - wgs84_e2*(math.sin(x)**2))
-    
-    x = (n(lat) + alt)*math.cos(lat)*math.cos(lon)
-    y = (n(lat) + alt)*math.cos(lat)*math.sin(lon)
-    z = (n(lat)*(1-wgs84_e2)+alt)*math.sin(lat)
-    
-    return [x,y,z]
-
 scene = getSceneManager()
 
 # deal with audio                                                                         
@@ -594,21 +595,20 @@ all.addChild(xLine)
 count = 0
 for t in TYPE:
 	f = open('Crimes2013_3_final.csv', 'rb')
-	line = csv.reader(f)
+	lines = csv.reader(f)
 	count = 0
 	for items in lines:
 		if ():
-			crime_lat = float(items[19])
-			crime_lon = float(items[20])
-			pos = llh2ecef(crime_lat, crime_lon, 50.0)
-			model = BoxShape.create(20,20,20)
+			crime_lat = float(items[6])
+			crime_lon = float(items[7])
+			pos = llh2ecef(crime_lat, crime_lon, 8.0)
+			model = BoxShape.create(1,15,15)
 			model.setPosition(pos[0],pos[1],pos[2])
-			model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
+			#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
 			model.setEffect('colored -d red')
 			all.addChild(model)
 			count+=1
-		else:
-			# TO DO
+		# TO DO ELSE
 	f.close()
 
 # since the scale here is pretty large stereo doesnt help much
@@ -691,6 +691,9 @@ setUpdateFunction(onUpdate)
 
 ## HOW TO GO TO A COMMUNITY
 def goCommunities(x):
+	print "going to %s at (%f,%f)" %(comm[x].name, comm[x].lat, comm[x].lon)
+
+conditionstat="""
 	if x<39: # 1 - 38
 		if x<20: # 1 - 19
 			if x<10: # 1 - 9
@@ -907,6 +910,7 @@ def goCommunities(x):
 							print btn_76.getText();
 						else:
 							print btn_77.getText();
+"""
 
 ## HOW TO FILTER CRIME TYPES
 def clickHom():
