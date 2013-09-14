@@ -1,0 +1,31 @@
+<map name="MyMap" type="geocentric" version="2">
+    <image name="bluemarble" driver="gdal">
+        <url>world.tif</url>
+    </image>
+
+    <model name="commareas" driver="feature_geom" enabled="true" visible="true">
+        <features name="commareas" driver="ogr" build_spatial_index="true">
+            <url>CTA_RailLines2.shp</url>
+        </features>
+        
+        <!--
+        <fading max_range="3500"/>
+        -->
+        
+        <layout crop_features="true" tile_size_factor="15">
+            <level max_range="500000"/>
+        </layout>
+        
+
+        <styles>
+            <style type="text/css">
+                commareas {
+                    stroke:                       #ffff00;
+                    stroke-width:                 3;
+                    altitude-clamping:            terrain;
+                    altitude-technique:           gpu;
+                }
+            </style>
+        </styles>        
+    </model>
+</map>

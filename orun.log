@@ -1,0 +1,506 @@
+omegalib data search paths:
+::: C:\Users\joysword\Documents\GitHub\cs526p1
+::: 
+::: C:/Users/joysword/Documents/GitHub/omegalib/data
+omegalib application config lookup:
+::: trying orun/orun.cfg
+::: not found, trying orun.cfg
+::: not found, trying default.cfg
+::: found config: default.cfg
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OMEGALIB BOOT
+SystemManager::setup
+Opened config file: default.cfg
+SystemManager::setup: systemConfig = system/desktop.cfg
+Opened config file: system/desktop.cfg
+SharedDataServices::registerObject: queuing interp for registration
+PythonInterpreter::addPythonPath: ./
+PythonInterpreter::addPythonPath: C:/Users/joysword/Documents/GitHub/omegalib-course/bin/debug/
+PythonInterpreter::addPythonPath: C:/Users/joysword/Documents/GitHub/omegalib/data
+PythonInterpreter: starting interactive shell thread.
+omegaPythonApiInit()
+Python Interpreter initialized.
+SystemManager::setupDisplaySystem: type = Equalizer
+Bezel size: 0 0
+canvas pixel size: 854 480
+ModuleServices::addModule: OmegaViewer
+Service added: MouseService
+Service added: KeyboardService
+Service added: ViewRayService
+Initializing mission control server...
+ServiceManager::initialize
+Event buffer allocated. Max events: 512
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< OMEGALIB BOOT
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DISPLAY INITIALIZATION
+[EQ] ConfigImpl::ConfigImpl
+[EQ] ConfigImpl::init
+ModuleServices::addModule: EventSharingModule
+Console: adding log listener
+ModuleServices::addModule: console
+Camera controller: keyboardmouse
+ModuleServices::addModule: CameraController
+Engine: Running with sound disabled.
+Death switch timeout: 60 seconds
+[EQ] NodeImpl::NodeImpl
+[EQ] NodeImpl::configInit a0133e5d03500367:578b1522e3d149cb
+@Renderer::Initialize: id = 0
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DISPLAY INITIALIZATION
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> APPLICATION LOOP
+!!! EventSharingModule::share: server not initialized yet. Ignoring call.
+Creating death switch thread
+omegaToolkitPythonApiInit()
+cyclopsPythonApiInit()
+PythonInterpreter::runFile: running default_init.py
+ModuleServices::addModule: MenuManager
+ModuleServices::addModule: UiModule
+UiModule initializing...
+UiModule initialization OK
+Renderer(0): adding render pass UiRenderPass
+
+
+
+---------------------------------------------------------------------
+Welcome to orun!
+	omegalib version 4.2
+	To get a list of quick commands type :?
+	Type :? . to list all global symbols
+	Type :? C to list all members of class or variable `C`
+		example :? SceneNode
+	Type :? ./C [prefix] to list global symbols or object members starting with `prefix`
+		example :? . si
+		example :? SceneNode set
+
+
+
+
+Renderer(0): adding render pass console
+PythonInterpreter::runFile: running .\simpleearth.py
+ModuleServices::addModule: OsgModule
+Renderer(0): adding render pass OsgRenderPass
+ModuleServices::addModule: SceneManager
+SceneManager configuration loaded
+::    Shadows enabled: 0
+:: Shadow resolution ratio: 1
+Recompiling shaders (variation: .0-811c9dc5)
+ModelLoaderThread: start
+Attemped to loaded buffer ID 10, but not connected to a sound server!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SceneManager::loadModel
+Loading model readymap.earth
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SceneManager::loadModel
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SceneManager::loadModel
+Loading model simple.earth
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SceneManager::loadModel
+
+Creating vertex shader cyclops/common/colored.vert.0-811c9dc5
+Loading shader: cyclops/common/colored.vert
+Creating fragment shader cyclops/common/colored.frag.0-811c9dc5
+Loading shader: cyclops/common/colored.frag
+
+>>>>> PYTHON ERROR!!! Traceback (most recent call last):
+  File ".\simpleearth.py", line 281, in <module>
+    menu.addItem(MenuItem.Image)
+AttributeError: type object 'MenuItem' has no attribute 'Image'
+Lights changed (active lights: 1)
+Recompiling shaders (variation: .1-98bb9bc2)
+Creating vertex shader cyclops/common/colored.vert.1-98bb9bc2
+Creating fragment shader cyclops/common/colored.frag.1-98bb9bc2
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< APPLICATION LOOP
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OMEGALIB SHUTDOWN
+ModuleServices::disposeNonCoreModules
+MenuManager::dispose: cleaning up 3 menus
+UiModule::dispose
+Engine: removing render pass UiRenderPass
+Engine: removing render pass OsgRenderPass
+ModelLoaderThread: shutdown
+SceneManager::unload: emptying load queue (0 queued items)
+SceneManager::unload: releasing 2 models
+SceneManager::unload: releasing 1 lights
+SceneManager::unload: releasing 1 programs
+SceneManager::unload: releasing 1 programs
+~Node: everything
+~Node: Unnamed_22
+~Node: Unnamed_10
+~Node: Unnamed_202
+~Node: Unnamed_27
+~Node: Unnamed_13
+~Node: Unnamed_203
+~Node: Unnamed_20
+~Node: Unnamed_5
+~Node: Unnamed_16
+~Node: Unnamed_200
+~Node: Unnamed_84
+~Node: Unnamed_134
+~Node: Unnamed_25
+~Node: Unnamed_6
+~Node: Unnamed_11
+~Node: Unnamed_201
+~Node: Unnamed_85
+~Node: Unnamed_135
+~Node: Unnamed_26
+~Node: Unnamed_7
+~Node: Unnamed_14
+~Node: Unnamed_206
+~Node: Unnamed_86
+~Node: Unnamed_136
+~Node: Unnamed_8
+~Node: Unnamed_17
+~Node: Unnamed_207
+~Node: Unnamed_87
+~Node: Unnamed_137
+~Node: Unnamed_24
+~Node: Unnamed_9
+~Node: Unnamed_12
+~Node: Unnamed_88
+~Node: Unnamed_21
+~Node: Unnamed_15
+~Node: Unnamed_205
+~Node: Unnamed_81
+~Node: Unnamed_155
+~Node: Unnamed_18
+~Node: Unnamed_82
+~Node: Unnamed_154
+~Node: Unnamed_19
+~Node: Unnamed_209
+~Node: Unnamed_23
+~Node: Unnamed_28
+~Node: Unnamed_120
+~Node: Unnamed_37
+~Node: Unnamed_109
+~Node: Unnamed_242
+~Node: Unnamed_50
+~Node: Unnamed_29
+~Node: Unnamed_123
+~Node: Unnamed_36
+~Node: Unnamed_108
+~Node: Unnamed_243
+~Node: Unnamed_53
+~Node: Unnamed_30
+~Node: Unnamed_249
+~Node: Unnamed_59
+~Node: Unnamed_31
+~Node: Unnamed_248
+~Node: Unnamed_56
+~Node: Unnamed_32
+~Node: Unnamed_247
+~Node: Unnamed_57
+~Node: Unnamed_33
+~Node: Unnamed_246
+~Node: Unnamed_54
+~Node: Unnamed_34
+~Node: Unnamed_245
+~Node: Unnamed_55
+~Node: Unnamed_122
+~Node: Unnamed_35
+~Node: Unnamed_244
+~Node: Unnamed_52
+~Node: Unnamed_38
+~Node: Unnamed_39
+~Node: Unnamed_40
+~Node: Unnamed_67
+~Node: Unnamed_41
+~Node: Unnamed_42
+~Node: Unnamed_65
+~Node: Unnamed_43
+~Node: Unnamed_66
+~Node: Unnamed_44
+~Node: Unnamed_63
+~Node: Unnamed_45
+~Node: Unnamed_64
+~Node: Unnamed_46
+~Node: Unnamed_61
+~Node: Unnamed_47
+~Node: Unnamed_62
+~Node: Unnamed_48
+~Node: Unnamed_49
+~Node: Unnamed_60
+~Node: Unnamed_193
+~Node: Unnamed_241
+~Node: Unnamed_51
+~Node: Unnamed_58
+~Node: Unnamed_173
+~Node: Unnamed_68
+~Node: Unnamed_170
+~Node: Unnamed_69
+~Node: Unnamed_70
+~Node: Unnamed_71
+~Node: Unnamed_72
+~Node: Unnamed_232
+~Node: Unnamed_73
+~Node: Unnamed_74
+~Node: Unnamed_238
+~Node: Unnamed_75
+~Node: Unnamed_239
+~Node: Unnamed_76
+~Node: Unnamed_77
+~Node: Unnamed_168
+~Node: Unnamed_237
+~Node: Unnamed_78
+~Node: Unnamed_169
+~Node: Unnamed_234
+~Node: Unnamed_79
+~Node: Unnamed_157
+~Node: Unnamed_204
+~Node: Unnamed_80
+~Node: Unnamed_156
+~Node: Unnamed_83
+~Node: Unnamed_89
+~Node: Unnamed_214
+~Node: Unnamed_90
+~Node: Unnamed_215
+~Node: Unnamed_91
+~Node: Unnamed_212
+~Node: Unnamed_92
+~Node: Unnamed_213
+~Node: Unnamed_93
+~Node: Unnamed_145
+~Node: Unnamed_218
+~Node: Unnamed_94
+~Node: Unnamed_146
+~Node: Unnamed_219
+~Node: Unnamed_95
+~Node: Unnamed_216
+~Node: Unnamed_96
+~Node: Unnamed_144
+~Node: Unnamed_217
+~Node: Unnamed_97
+~Node: Unnamed_98
+~Node: Unnamed_99
+~Node: Unnamed_100
+~Node: Unnamed_195
+~Node: Unnamed_299
+~Node: Unnamed_101
+~Node: Unnamed_194
+~Node: Unnamed_102
+~Node: Unnamed_103
+~Node: Unnamed_104
+~Node: Unnamed_199
+~Node: Unnamed_105
+~Node: Unnamed_198
+~Node: Unnamed_106
+~Node: Unnamed_107
+~Node: Unnamed_290
+~Node: Unnamed_110
+~Node: Unnamed_111
+~Node: Unnamed_112
+~Node: Unnamed_113
+~Node: Unnamed_114
+~Node: Unnamed_115
+~Node: Unnamed_116
+~Node: Unnamed_117
+~Node: Unnamed_118
+~Node: Unnamed_119
+~Node: Unnamed_121
+~Node: Unnamed_124
+~Node: Unnamed_125
+~Node: Unnamed_126
+~Node: Unnamed_127
+~Node: Unnamed_128
+~Node: Unnamed_129
+~Node: Unnamed_130
+~Node: Unnamed_131
+~Node: Unnamed_132
+~Node: Unnamed_133
+~Node: Unnamed_138
+~Node: Unnamed_139
+~Node: Unnamed_140
+~Node: Unnamed_141
+~Node: Unnamed_142
+~Node: Unnamed_143
+~Node: Unnamed_147
+~Node: Unnamed_148
+~Node: Unnamed_149
+~Node: Unnamed_150
+~Node: Unnamed_151
+~Node: Unnamed_152
+~Node: Unnamed_153
+~Node: Unnamed_208
+~Node: Unnamed_158
+~Node: Unnamed_159
+~Node: Unnamed_160
+~Node: Unnamed_161
+~Node: Unnamed_162
+~Node: Unnamed_163
+~Node: Unnamed_164
+~Node: Unnamed_165
+~Node: Unnamed_166
+~Node: Unnamed_235
+~Node: Unnamed_167
+~Node: Unnamed_171
+~Node: Unnamed_172
+~Node: Unnamed_174
+~Node: Unnamed_175
+~Node: Unnamed_176
+~Node: Unnamed_177
+~Node: Unnamed_178
+~Node: Unnamed_179
+~Node: Unnamed_180
+~Node: Unnamed_181
+~Node: Unnamed_182
+~Node: Unnamed_183
+~Node: Unnamed_184
+~Node: Unnamed_185
+~Node: Unnamed_186
+~Node: Unnamed_187
+~Node: Unnamed_188
+~Node: Unnamed_189
+~Node: Unnamed_190
+~Node: Unnamed_191
+~Node: Unnamed_192
+~Node: Unnamed_240
+~Node: Unnamed_196
+~Node: Unnamed_298
+~Node: Unnamed_197
+~Node: Unnamed_210
+~Node: Unnamed_211
+~Node: Unnamed_220
+~Node: Unnamed_221
+~Node: Unnamed_222
+~Node: Unnamed_223
+~Node: Unnamed_224
+~Node: Unnamed_225
+~Node: Unnamed_226
+~Node: Unnamed_227
+~Node: Unnamed_228
+~Node: Unnamed_229
+~Node: Unnamed_230
+~Node: Unnamed_231
+~Node: Unnamed_233
+~Node: Unnamed_236
+~Node: Unnamed_250
+~Node: Unnamed_251
+~Node: Unnamed_252
+~Node: Unnamed_253
+~Node: Unnamed_254
+~Node: Unnamed_255
+~Node: Unnamed_256
+~Node: Unnamed_257
+~Node: Unnamed_258
+~Node: Unnamed_259
+~Node: Unnamed_260
+~Node: Unnamed_261
+~Node: Unnamed_262
+~Node: Unnamed_263
+~Node: Unnamed_264
+~Node: Unnamed_265
+~Node: Unnamed_266
+~Node: Unnamed_267
+~Node: Unnamed_268
+~Node: Unnamed_269
+~Node: Unnamed_270
+~Node: Unnamed_283
+~Node: Unnamed_271
+~Node: Unnamed_282
+~Node: Unnamed_272
+~Node: Unnamed_273
+~Node: Unnamed_274
+~Node: Unnamed_300
+~Node: Unnamed_275
+~Node: Unnamed_301
+~Node: Unnamed_276
+~Node: Unnamed_289
+~Node: Unnamed_277
+~Node: Unnamed_288
+~Node: Unnamed_278
+~Node: Unnamed_279
+~Node: Unnamed_280
+~Node: Unnamed_281
+~Node: Unnamed_284
+~Node: Unnamed_285
+~Node: Unnamed_286
+~Node: Unnamed_287
+~Node: Unnamed_291
+~Node: Unnamed_292
+~Node: Unnamed_293
+~Node: Unnamed_294
+~Node: Unnamed_295
+~Node: Unnamed_296
+~Node: Unnamed_297
+~Node: Unnamed_2
+~Menu menu
+~Widget container
+~Menu Main Menu
+~Widget container
+~Widget Widget_6
+~Widget Widget_9
+~Widget Widget_8
+~Widget subMenu_button
+~Menu Submenu
+~Widget container
+~Widget Widget_13
+~Widget Widget_12
+~Widget button
+~Widget Widget_16
+~Widget Widget_15
+~Widget button
+~Widget Widget_19
+~Widget Widget_18
+~Widget button
+~Widget Widget_22
+~Widget Widget_21
+~Widget button
+~Widget label
+~Widget Widget_24
+~Widget Widget_27
+~Widget Widget_26
+~Widget button
+~Widget Widget_30
+~Widget Widget_29
+~Widget button
+~Widget Widget_33
+~Widget Widget_32
+~Widget button
+~Widget Widget_36
+~Widget Widget_35
+~Widget button
+~Node: Unnamed_4
+~Node: Unnamed_3
+~Node: Unnamed_303
+~MenuManager
+~UiModule
+~EngineModule UiModule
+~EngineModule MenuManager
+~OsgModule
+~EngineModule OsgModule
+~EngineModule SceneManager
+~Node: Unnamed_302
+Engine::dispose
+ModuleServices::disposeAll
+EventSharingModule::dispose
+~EngineModule OmegaViewer
+~EngineModule EventSharingModule
+~Console: removing log listener
+~EngineModule console
+~EngineModule CameraController
+~Node: root
+Engine::dispose: cleaning up 0 cameras
+~Node: DefaultCamera
+~SceneView
+~SceneView
+~RenderPass OsgRenderPass
+~Widget Widget_5
+~Widget Widget_4
+~Widget mainButton
+~Widget Widget_1
+~RenderPass UiRenderPass
+~RenderPass console
+~Engine
+~PythonInterpreter
+~EngineModule MissionControlClient
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< OMEGALIB SHUTDOWN
+
+
+===================== ReferenceType object leaks follow:
+class omegaToolkit::ui::DefaultButtonRenderable: 1
+class omicron::FilesystemDataSource: 5
+class omicron::FilesystemDataSource: 1
+class omega::DisplayTileConfig: 1
+class omegaToolkit::ui::LabelRenderable: 1
+class omegaToolkit::ui::ContainerRenderable: 1
+class omegaToolkit::ui::ImageRenderable: 1
+struct omega::RenderableCommand: 4
