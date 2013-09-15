@@ -4,6 +4,13 @@ from omegaToolkit import *
 import csv
 import caveutil
 
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+
+import urllib2
+
 # radius of the globe
 #radius = 6356752.5 + 0000.0
 #radius = 6378137
@@ -168,9 +175,6 @@ comm[52] = community("East Side", 41.7, -87.56)
 comm[53] = community("West Pullman", 41.68, -87.63)
 comm[54] = community("Riverdale", 41.66, -87.61)
 comm[55] = community("Hegewisch", 41.66, -87.55)
-
-for i in range(10,77):
-	print i,comm[i].name
 
 ##############################################################################################################
 # CREATE MENUS
@@ -517,18 +521,18 @@ else:
 #laptop: it works (without showing anything)
 #cave: works (too low no data)
 
-scene.loadModel(torusModel)
-scene.loadModel(torusModel2)
+#scene.loadModel(torusModel)
+#scene.loadModel(torusModel2)
 
 # Create a scene object using the loaded model
-torus1 = StaticObject.create("earth")
-torus1.getMaterial().setLit(False)
-all.addChild(torus1)
+#torus1 = StaticObject.create("earth")
+#torus1.getMaterial().setLit(False)
+#all.addChild(torus1)
 
-torus2 = StaticObject.create("map")
-torus2.getMaterial().setLit(False)
-all.addChild(torus2)
-torus2.setVisible(False)
+#torus2 = StaticObject.create("map")
+#torus2.getMaterial().setLit(False)
+#all.addChild(torus2)
+#torus2.setVisible(False)
 
 setNearFarZ(1, 20 * r_a)
 
@@ -592,24 +596,49 @@ f.close()
 all.addChild(xLine)
 
 # SIN CITY
+def createCrimeDrawable():
+	return BoxShape.create(15,15,15)
+
+yearNode = [None]*14
+
+for i in range(1,13):
+	name = "year"+str(2000+i)
+	yearNode[i] = SceneNode.create(name)
+	all.addChild(yearNode[i])
+	for j in range(0,77):
+		name = "year"+str(2000+i)+"comm"+str(j)
+		yearNode[i].addChild(SceneNode.create(name))
+
+
 count = 0
-for t in TYPE:
-	f = open('Crimes2013_3_final.csv', 'rb')
-	lines = csv.reader(f)
-	count = 0
-	for items in lines:
-		if ():
-			crime_lat = float(items[6])
-			crime_lon = float(items[7])
-			pos = llh2ecef(crime_lat, crime_lon, 8.0)
-			model = BoxShape.create(1,15,15)
-			model.setPosition(pos[0],pos[1],pos[2])
-			#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
-			model.setEffect('colored -d red')
-			all.addChild(model)
-			count+=1
-		# TO DO ELSE
-	f.close()
+f = open('CrimesAll_final.csv', 'rb')
+lines = csv.reader(f)
+count = 0
+for items in lines:
+	crime_comm = int(items[4])
+	crime_year = int(items[5])
+	crime_lat = float(items[6])
+	crime_lon = float(items[7])
+	
+	pos = llh2ecef(crime_lat, crime_lon, 8.0)
+
+	model = createCrimeDrawable()
+	model.setPosition(pos[0],pos[1],pos[2])
+	#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
+	model.setEffect('colored -d red')
+	yearNode[crime_year-2000].getChildByIndex(crime_comm).addChild(model)
+	count+=1
+	# TO DO ELSE
+f.close()
+
+print "total number of crimes is %d" %(count)
+
+for i in range(1,12):
+	yearNode[i].setChildrenVisible(False)
+
+yearNode[13].setChildrenVisible(True)
+
+print "2013 visible"
 
 # since the scale here is pretty large stereo doesnt help much
 # so lets start with it turned off
@@ -620,16 +649,16 @@ for t in TYPE:
 # it would be better to set the speed based on the height over the surface
 # to move slower as you get closer
 
+# TEST FACE CAMERA
+testObject = PlaneShape.create(20, 20)
+all.addChild(testObject)
+caveutil.caveutil.positionAtHead (cam, testObject, 2)
+
 d0 = 0
 d1 = 0
 d2 = 0
 r = 0
 r2 = 0
-
-# TEST FACE CAMERA
-testObject = PlaneShape.create(20, 20)
-all.addChild(testObject)
-caveutil.caveutil.positionAtHead (cam, testObject, 2)
 
 # set flight speed based on altitude
 
@@ -974,6 +1003,25 @@ def clickkid():
 	else:
 		print "unchecked"
 
+#GET TRAIN LOCATION FROM CTA
+def getTrainInfo():
+
+	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
+	root = ET.fromstring(train_xml)
+	for route in root:
+		for train in route:
+			lat = float(train.find('lat').text)
+			lon = float(train.find('lon').text)
+			heading = float(train.find('heading').text)
+			pos = llh2ecef(lat, lon, 100.0)
+			model = BoxShape.create(100,20,200)
+			model.setBoundingBoxVisible(True)
+			model.setPosition(pos[0],pos[1],pos[2])
+			model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
+			model.setEffect('colored -d blue')
+			all.addChild(model)
+
+getTrainInfo()
 
 never ="""
 												!!!KIDNAPPING : 165
