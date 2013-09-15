@@ -601,42 +601,42 @@ def createCrimeDrawable():
 
 yearNode = [None]*14
 
-for i in range(1,13):
+for i in range(1,14):
 	name = "year"+str(2000+i)
 	yearNode[i] = SceneNode.create(name)
 	all.addChild(yearNode[i])
-	for j in range(0,77):
+	for j in range(0,78):
 		name = "year"+str(2000+i)+"comm"+str(j)
 		yearNode[i].addChild(SceneNode.create(name))
-
 
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
 lines = csv.reader(f)
 count = 0
 for items in lines:
-	crime_comm = int(items[4])
-	crime_year = int(items[5])
-	crime_lat = float(items[6])
-	crime_lon = float(items[7])
-	
-	pos = llh2ecef(crime_lat, crime_lon, 8.0)
+	if (cmp(items[2],'HOMICIDE')==0):
+		crime_comm = int(items[4])
+		crime_year = int(items[5])
+		crime_lat = float(items[6])
+		crime_lon = float(items[7])
+		
+		pos = llh2ecef(crime_lat, crime_lon, 8.0)
 
-	model = createCrimeDrawable()
-	model.setPosition(pos[0],pos[1],pos[2])
-	#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
-	model.setEffect('colored -d red')
-	yearNode[crime_year-2000].getChildByIndex(crime_comm).addChild(model)
-	count+=1
-	# TO DO ELSE
+		model = createCrimeDrawable()
+		model.setPosition(pos[0],pos[1],pos[2])
+		#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
+		model.setEffect('colored -d blue')
+		yearNode[crime_year-2000].getChildByIndex(crime_comm).addChild(model)
+		count+=1
+		# TO DO ELSE
 f.close()
 
-print "total number of crimes is %d" %(count)
+print "total number of homicide is %d" %(count)
 
-for i in range(1,12):
+for i in range(1,14):
 	yearNode[i].setChildrenVisible(False)
 
-yearNode[13].setChildrenVisible(True)
+#yearNode[13].setChildrenVisible(True)
 
 print "2013 visible"
 
