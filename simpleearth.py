@@ -385,59 +385,25 @@ cc = menu1_1filter.getContainer()
 
 btnCrime[None]*11
 
-for crime in crimeType:
-	btnCrime[crime.value] = Button.create(cc)
-	btncrime[crime.value] = setCheckable(True)
+for i in range(0,11):
+	btnCrime[i] = Button.create(cc)
+	btnCrime[i].setCheckable(True)
+	btnCrime[i].setChecked(False)
+	btnCrime[i].setUIEventCommand('clickCrime(i)')
 
-
-'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'VANDALISM':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9 'CRIM SEXUAL ASSAULT':10}
 btnCrime[0].setText("ALL MAJOR CRIMES")
 btnCrime[1].setText("Homicide")
 btnCrime[2].setText("Kidnapping")
 btnCrime[3].setText("Robbdery")
 btnCrime[4].setText("Burglary (Forcible Entry)")
-btnCrime[setText("Motor Vehicle Theft")
-btnCrime[alism.setText ("Vandalism (and damage to the City of Chicago)")
-btnCrime[n.setText("Arson")
-btnCrime[t.setText("Theft (over $500)")
-btnCrime[ult.setText("Aggravated Assault")
-btnCrime[setText("Aggravated Sexual Assault")
+btnCrime[5].setText("Motor Vehicle Theft")
+btnCrime[6].setText ("Vandalism (and damage to the City of Chicago)")
+btnCrime[7].setText("Arson")
+btnCrime[8].setText("Theft (over $500)")
+btnCrime[9].setText("Aggravated Assault")
+btnCrime[10].setText("Aggravated Sexual Assault")
 
-btn_allcrime.setCheckable(True)
-btn_homicide.setCheckable(True)
-btn_kidnap.setCheckable(True)
-btn_robbery.setCheckable(True)
-btn_burglary.setCheckable(True)
-btn_gta.setCheckable(True)
-btn_vandalism.setCheckable(True)
-btn_arson.setCheckable(True)
-btn_theft.setCheckable(True)
-btn_assault.setCheckable(True)
-btn_sex.setCheckable(True)
-
-btn_allcrime.setChecked(True)
-btn_homicide.setChecked(False)
-btn_kidnap.setChecked(False)
-btn_robbery.setChecked(False)
-btn_burglary.setChecked(False)
-btn_gta.setChecked(False)
-btn_vandalism.setChecked(False)
-btn_arson.setChecked(False)
-btn_theft.setChecked(False)
-btn_assault.setChecked(False)
-btn_sex.setChecked(False)
-
-btn_allcrime.setUIEventCommand('clickAllCrime()')
-btn_homicide.setUIEventCommand('clickHom()')
-btn_kidnap.setUIEventCommand('clickKid()')
-btn_robbery.setUIEventCommand('clickRob()')
-btn_burglary.setUIEventCommand('clickBur()')
-btn_gta.setUIEventCommand('clickGta()')
-btn_vandalism.setUIEventCommand('clickVan()')
-btn_arson.setUIEventCommand('clickArs()')
-btn_theft.setUIEventCommand('clickThe()')
-btn_assault.setUIEventCommand('clickAss()')
-btn_sex.setUIEventCommand('clickSex()')
+btnCrime[crimeType['ALL']].setChecked(True)
 
 menu1_2simu = menu0_chicago.addSubMenu("REAL TIME WATCH")
 
@@ -581,38 +547,43 @@ def createCrimeDrawable():
 
 #sincity="""
 nodeYear = [None]*14
+nodeComm = [None]*78
+nodeCrimeType = [None]*11
 
 for i in range(1,14):
 	name = "year"+str(2000+i)
 	nodeYear[i] = SceneNode.create(name)
 	all.addChild(nodeYear[i])
 	for j in range(0,78):
-		name = "year"+str(2000+i)+"comm"+str(j)
-		nodeYear[i].addChild(SceneNode.create(name))
+		name1 = name+"comm"+str(j)
+		nodeComm[j] = nodeYear[i].addChild(SceneNode.create(name1))
+		for k in range(0,11):
+			name2 = name1+"crimetype"+str(k)
+			nodeCrimeType[k] = nodeComm[j].addChild(SceneNode.create(name2))
 
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
 lines = csv.reader(f)
 count = 0
 for items in lines:
-	if (cmp(items[2],'HOMICIDE')==0):
-		crime_comm = int(items[4])
-		crime_year = int(items[5])
-		crime_lat = float(items[6])
-		crime_lon = float(items[7])
-		
-		pos = llh2ecef(crime_lat, crime_lon, 8.0)
+	crime_type = items[2]
+	crime_comm = int(items[4])
+	crime_year = int(items[5])
+	crime_lat = float(items[6])
+	crime_lon = float(items[7])
+	
+	pos = llh2ecef(crime_lat, crime_lon, 8.0)
 
-		model = createCrimeDrawable()
-		model.setPosition(pos)
-		#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
-		model.setEffect('colored -d blue')
-		nodeYear[crime_year-2000].getChildByIndex(crime_comm).getChildByIndex().addChild(model)
-		count+=1
-		# TO DO ELSE
+	model = createCrimeDrawable()
+	model.setPosition(pos)
+	#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
+	model.setEffect('colored -d blue')
+	nodeYear[crime_year-2000].getChildByIndex(crime_comm).getChildByIndex(crimeType[crime_type]).addChild(model)
+	count+=1
+	# TO DO ELSE
 f.close()
 
-print "total number of homicide is %d" %(count)
+print "total number of crime is %d" %(count)
 
 for i in range(1,14):
 	nodeYear[i].setChildrenVisible(False)
@@ -640,22 +611,6 @@ d1 = 0
 d2 = 0
 r = 0
 r2 = 0
-
-def clickAllCrime():
-	if btn_allcrime.isChecked():
-		btn_homicide.setChecked(False)
-		btn_assault.setChecked(False)
-		btn_vandalism.setChecked(False)
-		btn_gta.setChecked(False)
-		btn_burglary.setChecked(False)
-		btn_sex.setChecked(False)
-		btn_arson.setChecked(False)
-		btn_kidnap.setChecked(False)
-		btn_theft.setChecked(False)
-		btn_robbery.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
 
 #handle events from the wand
 # left button toggle between two maps
@@ -955,80 +910,80 @@ conditionstat="""
 
 ## HOW TO FILTER CRIME TYPES
 
-def clickCrime(i):
-	if (btnCrime[i].isChecked()):
-		btnCrime[i].setChecked(False)
-		for i in range(2001,2014):
-			if nodeYear[i-2000].isVisible():
-				for j in range(1,78):
-					if nodeYear[i-2000].getChildeByIndex(j).isVisible():
-						nodeYear[i-2000].getChildeByIndex(j).setChildrenVisible(False);
+notCrime = set()
+notYear = set()moule
+notCom = set()
 
+def clickCrime(crime):
+	if crime==0:
+		if btnCrime[0].isChecked()==False: # if we want to show all
+			btnCrime[0].setChecked(True)
+			notCrime.clear()
+			for j in range(1:11):
+				if btnCrime[j].isChecked()==False:
+					notCrime.add(j)
+					clickCrime(j)
+		else: # if we want to quit show all
+			btnCrime[0].setChecked(False)
+			for j in notCrime:
+				clickCrime(j)
+	else: # individual crime type 
+		if (btnCrime[crime].isChecked()): # if we want to uncheck this crime
+			btnCrime[crime].setChecked(False)
+			for year in range(1,14):
+				for com in range(1,78):
+					n = nodeYear[year].getChildByIndex(com)
+					if nodeYear[year].isVisible() and n.isVisible():
+						n.getChildByIndex(crime).setVisible(False)
+						n.getChildByIndex(crime).setChildrenVisible(False)
+					else:
+						n.getChildByIndex(crime).setVisible(False)
 
-def clickHom():
-	if btn_homicide.isChecked():
-		btn_allcrime.setChecked(False)
-		for i in range(2001,2013):
-			if nodeYear[i-2000].isVisible():
-				nodeYear[i-2000].getChildByIndex()
-				setChildrenVisible
+		else: # if we want to check this crime
+			btnCrime[crime].setChecked(True)
+			for year in range(1,14):
+				for com in range(1,78):
+					n = nodeYear[year].getChildByIndex(com)
+					if nodeYear[year].isVisible() and n.isVisible():
+						n.getChildByIndex(crime).setVisible(True)
+						n.getChildByIndex(crime).setChildrenVisible(True)
+					else:
+						n.getChildByIndex(crime).setVisible(True)
 
-	else:
-		print "unchecked"
-def clickAss():
-	if btn_assault.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickVan():
-	if btn_vandalism.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickGta():
-	if btn_gta.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickBur():
-	if btn_burglary.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickThe():
-	if btn_theft.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickRob():
-	if btn_robbery.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickSex():
-	if btn_sex.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickArs():
-	if btn_arson.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
-def clickkid():
-	if btn_kid.isChecked():
-		btn_allcrime.setChecked(False)
-		print "checked"
-	else:
-		print "unchecked"
+def clickYear(year):
+	if year==0:
+		if btnYear[0].isChecked()==False: # if we want to show all
+			btnYear[0].setChecked(True)
+			notYear.clear()
+			for j in range(1:14):
+				if btnYear[j].isChecked()==False:
+					notYear.add(j)
+					clickYear(j)
+		else: # if we want to quit show all
+			btnYear[0].setChecked(False)
+			for j in notYear:
+				clickYear(j)
+	else: # individual year
+		if (btnYear[year].isChecked()): # if we want to uncheck this year
+			btnYear[year].setChecked(False)
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeYear[year].getChildByIndex(com).getChildByIndex(crime)
+					if nodeYear[year].getChildByIndex(com).isVisible() and n.isVisible():
+						nodeYear[year].setVisible(False)
+						n.setChildrenVisible(False)
+					else:
+						nodeYear[year].setVisible(False)
+		else: # if we want to check this year
+			btnCrime[crime].setChecked(True)
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeYear[year].getChildByIndex(com).getChildByIndex(crime)
+					if nodeYear[year].getChildByIndex(com).isVisible() and n.isVisible():
+						nodeYear[year].setVisible(True)
+						n.setChildrenVisible(True)
+					else:
+						nodeYear[year].setVisible(True)
 
 #GET TRAIN LOCATION FROM CTA
 def getTrainInfo():
