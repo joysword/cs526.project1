@@ -1,6 +1,7 @@
 from omega import *
 from cyclops import *
 from omegaToolkit import *
+from euclid import *
 import csv
 import caveutil
 
@@ -11,6 +12,8 @@ except ImportError:
 
 import urllib2
 
+def testfunc():
+	print "test"
 # radius of the globe
 #radius = 6356752.5 + 0000.0
 #radius = 6378137
@@ -38,45 +41,61 @@ def llh2ecef(lat, lon, alt):
 	
 	return Vector3(x,y,z)
 
-TYPE = set(["KIDNAPPING",
-"PUBLIC INDECENCY",
-"PUBLIC PEACE VIOLATION",
-"INTERFERENCE WITH PUBLIC OFFICER",
-"PROSTITUTION",
-"LIQUOR LAW VIOLATION",
-"ROBBERY",
-"BURGLARY",
-"WEAPONS VIOLATION",
-"HOMICIDE",
-"OBSCENITY",
-"OTHER OFFENSE",
-"CRIMINAL DAMAGE",
-"THEFT",
-"OFFENSE INVOLVING CHILDREN",
-"GAMBLING",
-"OTHER NARCOTIC VIOLATION",
-"ARSON",
-"OTHER OFFENSE",
-"NARCOTICS",
-"SEX OFFENSE",
-"STALKING",
-"INTIMIDATION",
-"DECEPTIVE PRACTICE",
-"BATTERY",
-"CRIMINAL TRESPASS",
-"MOTOR VEHICLE THEFT",
-"ASSAULT",
-"CRIM SEXUAL ASSAULT",
-"NON-CRIMINAL",
-"INTERFERE WITH PUBLIC OFFICER",
-"RITUALISM",
-"OTHER NARCOTIC VIOLATION",
-"HOMICIDE",
-"OBSCENITY",
-"OFFENSES INVOLVING CHILDREN",
-"NON-CRIMINAL (SUBJECT SPECIFIED)",
-"DOMESTIC VIOLENCE"])
+TYPE = set
+(
+	["KIDNAPPING",
+	"PUBLIC INDECENCY",
+	"PUBLIC PEACE VIOLATION",
+	"INTERFERENCE WITH PUBLIC OFFICER",
+	"PROSTITUTION",
+	"LIQUOR LAW VIOLATION",
+	"ROBBERY",
+	"BURGLARY",
+	"WEAPONS VIOLATION",
+	"HOMICIDE",
+	"OBSCENITY",
+	"OTHER OFFENSE",
+	"CRIMINAL DAMAGE",
+	"THEFT",
+	"OFFENSE INVOLVING CHILDREN",
+	"GAMBLING",
+	"OTHER NARCOTIC VIOLATION",
+	"ARSON",
+	"OTHER OFFENSE",
+	"NARCOTICS",
+	"SEX OFFENSE",
+	"STALKING",
+	"INTIMIDATION",
+	"DECEPTIVE PRACTICE",
+	"BATTERY",
+	"CRIMINAL TRESPASS",
+	"MOTOR VEHICLE THEFT",
+	"ASSAULT",
+	"CRIM SEXUAL ASSAULT",
+	"NON-CRIMINAL",
+	"INTERFERE WITH PUBLIC OFFICER",
+	"RITUALISM",
+	"OTHER NARCOTIC VIOLATION",
+	"HOMICIDE",
+	"OBSCENITY",
+	"OFFENSES INVOLVING CHILDREN",
+	"NON-CRIMINAL (SUBJECT SPECIFIED)",
+	"DOMESTIC VIOLENCE"]
+)
 
+btn_allcrime = Button.create(cc)
+btn_homicide = Button.create(cc)
+btn_kidnap = Button.create(cc)
+btn_robbery = Button.create(cc)
+btn_burglary = Button.create(cc)
+btn_gta = Button.create(cc)
+btn_vandalism = Button.create(cc)
+btn_arson = Button.create(cc)
+btn_theft = Button.create(cc)
+btn_assault = Button.create(cc)
+btn_sex = Button.create(cc)
+
+crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'VANDALISM':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9 'CRIM SEXUAL ASSAULT':10}
 
 class community:
 	name = ''
@@ -364,28 +383,25 @@ menu1_1filter = menu0_chicago.addSubMenu("FILTER CRIME TYPES")
 
 cc = menu1_1filter.getContainer()
 
-btn_allcrime = Button.create(cc)
-btn_homicide = Button.create(cc)
-btn_kidnap = Button.create(cc)
-btn_robbery = Button.create(cc)
-btn_burglary = Button.create(cc)
-btn_gta = Button.create(cc)
-btn_vandalism = Button.create(cc)
-btn_arson = Button.create(cc)
-btn_theft = Button.create(cc)
-btn_assault = Button.create(cc)
-btn_sex = Button.create(cc)
-btn_allcrime.setText("ALL MAJOR CRIMES")
-btn_homicide.setText("Homicide")
-btn_kidnap.setText("Kidnapping")
-btn_robbery.setText("Robbdery")
-btn_burglary.setText("Burglary (Forcible Entry)")
-btn_gta.setText("Motor Vehicle Theft")
-btn_vandalism.setText ("Vandalism (and damage to the City of Chicago)")
-btn_arson.setText("Arson")
-btn_theft.setText("Theft (over $500)")
-btn_assault.setText("Aggravated Assault")
-btn_sex.setText("Aggravated Sexual Assault")
+btnCrime[None]*11
+
+for crime in crimeType:
+	btnCrime[crime.value] = Button.create(cc)
+	btncrime[crime.value] = setCheckable(True)
+
+
+'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'VANDALISM':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9 'CRIM SEXUAL ASSAULT':10}
+btnCrime[0].setText("ALL MAJOR CRIMES")
+btnCrime[1].setText("Homicide")
+btnCrime[2].setText("Kidnapping")
+btnCrime[3].setText("Robbdery")
+btnCrime[4].setText("Burglary (Forcible Entry)")
+btnCrime[setText("Motor Vehicle Theft")
+btnCrime[alism.setText ("Vandalism (and damage to the City of Chicago)")
+btnCrime[n.setText("Arson")
+btnCrime[t.setText("Theft (over $500)")
+btnCrime[ult.setText("Aggravated Assault")
+btnCrime[setText("Aggravated Sexual Assault")
 
 btn_allcrime.setCheckable(True)
 btn_homicide.setCheckable(True)
@@ -563,16 +579,16 @@ all.addChild(xLine)
 def createCrimeDrawable():
 	return BoxShape.create(15,15,15)
 
-sincity="""
-yearNode = [None]*14
+#sincity="""
+nodeYear = [None]*14
 
 for i in range(1,14):
 	name = "year"+str(2000+i)
-	yearNode[i] = SceneNode.create(name)
-	all.addChild(yearNode[i])
+	nodeYear[i] = SceneNode.create(name)
+	all.addChild(nodeYear[i])
 	for j in range(0,78):
 		name = "year"+str(2000+i)+"comm"+str(j)
-		yearNode[i].addChild(SceneNode.create(name))
+		nodeYear[i].addChild(SceneNode.create(name))
 
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
@@ -591,7 +607,7 @@ for items in lines:
 		model.setPosition(pos)
 		#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
 		model.setEffect('colored -d blue')
-		yearNode[crime_year-2000].getChildByIndex(crime_comm).addChild(model)
+		nodeYear[crime_year-2000].getChildByIndex(crime_comm).getChildByIndex().addChild(model)
 		count+=1
 		# TO DO ELSE
 f.close()
@@ -599,11 +615,11 @@ f.close()
 print "total number of homicide is %d" %(count)
 
 for i in range(1,14):
-	yearNode[i].setChildrenVisible(False)
+	nodeYear[i].setChildrenVisible(False)
 
-#yearNode[13].setChildrenVisible(True)
+#nodeYear[13].setChildrenVisible(True)
 #print "2013 visible"
-"""
+#"""
 
 # since the scale here is pretty large stereo doesnt help much
 # so lets start with it turned off
@@ -624,18 +640,6 @@ d1 = 0
 d2 = 0
 r = 0
 r2 = 0
-
-# set flight speed based on altitude
-
-def onUpdate(frame, t, dt):
-	d = cam.getPosition()
-	d0 = float(d.x)
-	d1 = float(d.y)
-	d2 = float(d.z)
-	r = math.sqrt(d0*d0 + d1*d1 + d2*d2) - r_a # altitude in cm
-	if r<500:
-		r=500
-	cam.getController().setSpeed(r)
 
 def clickAllCrime():
 	if btn_allcrime.isChecked():
@@ -660,15 +664,35 @@ isButton7down = False
 wandOldPos = Vector3()
 wandOldOri = Quaternion()
 
-def playBtnSound():
-	sd = SoundInstance()
+def playBtnDownSound(e):
+	sd = SoundInstance(env.loadSoundFromFile("/sound/menu/down.wav"))
+	sd.setPosition( e.getPosition() )
+	sd.setVolume(1.0)
+	sd.setWidth(20)
+	sd.play()
+def playBtnUpSound(e):
+	sd = SoundInstance(env.loadSoundFromFile("/sound/menu/up.wav"))
+	sd.setPosition( e.getPosition() )
+	sd.setVolume(1.0)
+	sd.setWidth(20)
+	sd.play()
+
+#uim = UiModule.createAndInitialize()
+#wf = uim.getWidgetFactory()
+#ui = uim.getUi()
+
+#newBtn = wf.createButton('testButton', ui)
+#newBtn.setUIEventCommand('testfunc()')
+
+#newBtn.setPosition(Vector3(20,20))
 
 def onEvent():
 	global userScaleFactor
 
 	e = getEvent()
 
-	if(e.isButtonDown(EventFlags.ButtonLeft)):
+	if (e.isButtonDown(EventFlags.ButtonLeft)):
+		playBtnDownSound(e)
 		print("Left button pressed")
 		if torus1.isVisible():
 			torus1.setVisible(False)
@@ -677,22 +701,30 @@ def onEvent():
 			torus1.setVisible(True)
 			torus2.setVisible(False)
 
-	if(e.isButtonDown(EventFlags.Button7)):
+	elif (e.isButtonDown(EventFlags.Button7)):
+		playBtnDownSound(e)
 		isButton7down = True
 		wandOldPos = e.getPosition()
+		wandOldOri = e.getOrientation()
 
-	if (e.isButtonUp(EventFlags.Button7)):
+	elif (e.isButtonUp(EventFlags.Button7)):
 		isButton7down = False
+	
+	elif (e.getType()==EventType.Update) and (isButton7down):
+		wandPos = e.getPosition()
+		cam.setPosition( cam.getPosition() + (wandPos-wandOldPos)*cam.getController().getSpeed()*0.01 )
+		wandOri = e.getOrientation()
+		cam.setOrientation( cam.getOrientation() + (wandOri-wandOldOrientation)*0.01 )
 
-	#play button sound
-	si_sound = SoundInstance(env.loadSoundFromFile("/sound/menu/click.wav"))
-	si_sound.setPosition( e.getPosition() )
-	si_sound.setVolume(1.0)
-	si_sound.setWidth(20)
-	si_sound.play()
-
-# by default user can use the joystick to spin the world and fly
-# but a better flying model should be added in
+def onUpdate(frame, t, dt):
+	d = cam.getPosition()
+	d0 = float(d.x)
+	d1 = float(d.y)
+	d2 = float(d.z)
+	r = math.sqrt(d0*d0 + d1*d1 + d2*d2) - r_a # altitude in cm
+	if r<500:
+		r=500
+	cam.getController().setSpeed(r)
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
@@ -922,10 +954,25 @@ conditionstat="""
 """
 
 ## HOW TO FILTER CRIME TYPES
+
+def clickCrime(i):
+	if (btnCrime[i].isChecked()):
+		btnCrime[i].setChecked(False)
+		for i in range(2001,2014):
+			if nodeYear[i-2000].isVisible():
+				for j in range(1,78):
+					if nodeYear[i-2000].getChildeByIndex(j).isVisible():
+						nodeYear[i-2000].getChildeByIndex(j).setChildrenVisible(False);
+
+
 def clickHom():
 	if btn_homicide.isChecked():
 		btn_allcrime.setChecked(False)
-		print "checked"
+		for i in range(2001,2013):
+			if nodeYear[i-2000].isVisible():
+				nodeYear[i-2000].getChildByIndex()
+				setChildrenVisible
+
 	else:
 		print "unchecked"
 def clickAss():
