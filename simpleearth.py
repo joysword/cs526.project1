@@ -5,9 +5,9 @@ import csv
 import caveutil
 
 try:
-    import xml.etree.cElementTree as ET
+	import xml.etree.cElementTree as ET
 except ImportError:
-    import xml.etree.ElementTree as ET
+	import xml.etree.ElementTree as ET
 
 import urllib2
 
@@ -27,16 +27,16 @@ wgs84_a2 = wgs84_a**2 #to speed things up a bit
 wgs84_b2 = wgs84_b**2
 
 def llh2ecef(lat, lon, alt):
-    lat *= (math.pi / 180.0)
-    lon *= (math.pi / 180.0)
-    
-    n = lambda x: wgs84_a / math.sqrt(1 - wgs84_e2*(math.sin(x)**2))
-    
-    x = (n(lat) + alt)*math.cos(lat)*math.cos(lon)
-    y = (n(lat) + alt)*math.cos(lat)*math.sin(lon)
-    z = (n(lat)*(1-wgs84_e2)+alt)*math.sin(lat)
-    
-    return [x,y,z]
+	lat *= (math.pi / 180.0)
+	lon *= (math.pi / 180.0)
+	
+	n = lambda x: wgs84_a / math.sqrt(1 - wgs84_e2*(math.sin(x)**2))
+	
+	x = (n(lat) + alt)*math.cos(lat)*math.cos(lon)
+	y = (n(lat) + alt)*math.cos(lat)*math.sin(lon)
+	z = (n(lat)*(1-wgs84_e2)+alt)*math.sin(lat)
+	
+	return Vector3(x,y,z)
 
 TYPE = set(["KIDNAPPING",
 "PUBLIC INDECENCY",
@@ -82,17 +82,12 @@ class community:
 	name = ''
 	lat = 0
 	lon = 0
-	x = 0
-	y = 0
-	z = 0
+	pos = Vector3()
 	def __init__(self, n, x, y):
-		temp = llh2ecef(x,y,0)
 		self.name = n
 		self.lat = x
 		self.lon = y
-		self.x = temp[0]
-		self.y = temp[1]
-		self.z = temp[2]
+		self.pos = llh2ecef(x,y,0)
 	def watchme(self):
 		print ("watching community %s" %(self.name))
 
@@ -434,36 +429,10 @@ cc = menu1_2simu.getContainer()
 label_simu = Label.create(cc)
 label_simu.setText("TEST SIMULATION")
 
-def getPosition(lat, lon, height):
-
-	pos = [0,0,0]
-
-
-	FL = (r_a-r_b)/r_a
-	#print "FL:",FL
-	flatfn = (2.0 - FL)*FL
-	funsq = (1.0 - FL)*(1.0 - FL)
-	lat_rad = math.pi * lat / 180.0
-	lon_rad = math.pi * lon / 180.0
-
-	sin_lat = math.sin( lat_rad )
-
-	g1 = r_a / math.sqrt( 1.0 - flatfn*sin_lat*sin_lat)
-	g2 = g1*funsq + height
-	g1 = g1 + height
-
-	pos[0] = g1 * math.cos(lat_rad)
-	pos[1] = pos[0] * math.sin(lon_rad)
-	pos[0] = pos[0] * math.cos(lon_rad)
-	pos[2] = g2 * sin_lat
-
-	return pos
-
 scene = getSceneManager()
 
 # deal with audio                                                                         
 env = getSoundEnvironment()
-s_sound = env.loadSoundFromFile("beep", "/menu_sounds/menu_select.wav")
 
 # set the background to black
 scene.setBackgroundColor(Color(0, 0, 0, 1))
@@ -560,11 +529,8 @@ for name in ctastops:
 
 	#radius = getRadius(lat, r_a, r_b)
 
-	#pos = getPosition(float(bar[0]), float(bar[2]), 0.0)
-	#print "getPosition: ", pos
 	pos = llh2ecef(float(bar[0]), float(bar[2]), 0.0)
-	#print "llh2ecef: ", pos
-	model.setPosition(float(pos[0]), float(pos[1]), float(pos[2]))
+	model.setPosition(pos)
 	model.setEffect('colored -d red')
 	all.addChild(model)
 f.close()
@@ -575,21 +541,19 @@ xLine.setEffect("colored -d blue")
 f = open('LINE')
 ctastops = [line.rstrip('\n') for line in f]
 firsttime = 1
-oldPos = [0,0,0]
+oldPos = Vector3()
 for row in ctastops:
 	second = row.partition(',')
 	#print "first:",first
 	first = second[2].partition(',')
 	if (firsttime == 1):
-		#oldPos = getPosition(float(first[0]),float(second[0]),0.0)
 		oldPos = llh2ecef(float(first[0]), float(second[0]), 0.0)
 		firsttime = 0
 	else:
-		#pos = getPosition(float(first[0]),float(second[0]),0.0)
 		pos = llh2ecef(float(first[0]), float(second[0]), 0.0)
 		l = xLine.addLine()
-		l.setStart(Vector3(oldPos[0],oldPos[1],oldPos[2]))
-		l.setEnd(Vector3(pos[0],pos[1],pos[2]))
+		l.setStart(oldPos)
+		l.setEnd(pos)
 		l.setThickness(100.0)
 		oldPos = pos
 f.close()
@@ -599,6 +563,7 @@ all.addChild(xLine)
 def createCrimeDrawable():
 	return BoxShape.create(15,15,15)
 
+sincity="""
 yearNode = [None]*14
 
 for i in range(1,14):
@@ -623,7 +588,7 @@ for items in lines:
 		pos = llh2ecef(crime_lat, crime_lon, 8.0)
 
 		model = createCrimeDrawable()
-		model.setPosition(pos[0],pos[1],pos[2])
+		model.setPosition(pos)
 		#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
 		model.setEffect('colored -d blue')
 		yearNode[crime_year-2000].getChildByIndex(crime_comm).addChild(model)
@@ -637,8 +602,8 @@ for i in range(1,14):
 	yearNode[i].setChildrenVisible(False)
 
 #yearNode[13].setChildrenVisible(True)
-
-print "2013 visible"
+#print "2013 visible"
+"""
 
 # since the scale here is pretty large stereo doesnt help much
 # so lets start with it turned off
@@ -664,9 +629,9 @@ r2 = 0
 
 def onUpdate(frame, t, dt):
 	d = cam.getPosition()
-	d0 = float(d[0])
-	d1 = float(d[1])
-	d2 = float(d[2])
+	d0 = float(d.x)
+	d1 = float(d.y)
+	d2 = float(d.z)
 	r = math.sqrt(d0*d0 + d1*d1 + d2*d2) - r_a # altitude in cm
 	if r<500:
 		r=500
@@ -691,21 +656,36 @@ def clickAllCrime():
 #handle events from the wand
 # left button toggle between two maps
 
-def onEvent():
-    global userScaleFactor
+isButton7down = False
+wandOldPos = Vector3()
+wandOldOri = Quaternion()
 
-    e = getEvent()
-    if(e.isButtonDown(EventFlags.ButtonLeft)):
-        print("Left button pressed")
-        if torus1.isVisible():
-        	torus1.setVisible(False)
-        	torus2.setVisible(True)
-        else:
-        	torus1.setVisible(True)
-        	torus2.setVisible(False)
+def playBtnSound():
+	sd = SoundInstance()
+
+def onEvent():
+	global userScaleFactor
+
+	e = getEvent()
+
+	if(e.isButtonDown(EventFlags.ButtonLeft)):
+		print("Left button pressed")
+		if torus1.isVisible():
+			torus1.setVisible(False)
+			torus2.setVisible(True)
+		else:
+			torus1.setVisible(True)
+			torus2.setVisible(False)
+
+	if(e.isButtonDown(EventFlags.Button7)):
+		isButton7down = True
+		wandOldPos = e.getPosition()
+
+	if (e.isButtonUp(EventFlags.Button7)):
+		isButton7down = False
 
 	#play button sound
-	si_sound = SoundInstance(s_sound)
+	si_sound = SoundInstance(env.loadSoundFromFile("/sound/menu/click.wav"))
 	si_sound.setPosition( e.getPosition() )
 	si_sound.setVolume(1.0)
 	si_sound.setWidth(20)
