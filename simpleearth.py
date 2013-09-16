@@ -513,7 +513,7 @@ for name in ctastops:
 	foo = name.strip(' ()"')
 	bar = foo.partition(', ')
 
-	model = SphereShape.create(100, 4)
+	model = SphereShape.create(50, 4)
 	lat = float(bar[0]) * math.pi/180
 	lon = float(bar[2]) * math.pi/180
 
@@ -521,33 +521,51 @@ for name in ctastops:
 
 	pos = llh2ecef(float(bar[0]), float(bar[2]), 0.0)
 	model.setPosition(pos)
-	model.setEffect('colored -d red')
+	model.setEffect('colored -d white')
 	all.addChild(model)
 f.close()
 
-# a line
-xLine = LineSet.create()
-xLine.setEffect("colored -d blue")
-f = open('LINE')
-ctastops = [line.rstrip('\n') for line in f]
-firsttime = 1
-oldPos = Vector3()
-for row in ctastops:
-	second = row.partition(',')
-	#print "first:",first
-	first = second[2].partition(',')
-	if (firsttime == 1):
-		oldPos = llh2ecef(float(first[0]), float(second[0]), 0.0)
-		firsttime = 0
-	else:
-		pos = llh2ecef(float(first[0]), float(second[0]), 0.0)
-		l = xLine.addLine()
-		l.setStart(oldPos)
-		l.setEnd(pos)
-		l.setThickness(100.0)
-		oldPos = pos
+
+# CTA lines
+f = open('CHICAGO_DATA/CTARailLines.csv','rb')
+ctaread = csv.reader(f)
+for seg in ctaread:
+	xLine = LineSet.create()
+	oldPos = Vector3()
+	for i in range(0,len(seg)):
+		if i==0:
+			if (seg[i]=='BL'):
+				xLine.setEffect("colored -d #00a1de")
+			elif (seg[i]=='BR'):
+				xLine.setEffect("colored -d #62361b")
+			elif (seg[i]=='GR'):
+				xLine.setEffect("colored -d #009b3a")
+			elif (seg[i]=='ML'):
+				xLine.setEffect("colored -d #565a5c")
+			elif (seg[i]=='OR'):
+				xLine.setEffect("colored -d #f9461c")
+			elif (seg[i]=='PK'):
+				xLine.setEffect("colored -d #e27ea6")
+			elif (seg[i]=='PR'):
+				xLine.setEffect("colored -d #522398")
+			elif (seg[i]=='RD'):
+				xLine.setEffect("colored -d #c60c30")
+			elif (seg[i]=='YL'):
+				xLine.setEffect("colored -d #f9e300")
+		elif i==1:
+			coo = seg[i].split(',')
+			oldPos = llh2ecef(float(coo[1]),float(coo[0]), 0.0)
+			print oldPos
+		else:
+			coo = seg[i].split(',')
+			pos = llh2ecef(float(coo[1]),float(coo[0]), 0.0)
+			l = xLine.addLine()
+			l.setStart(oldPos)
+			l.setEnd(pos)
+			l.setThickness(60.0)
+			oldPos = pos
+	all.addChild(xLine)
 f.close()
-all.addChild(xLine)
 
 # SIN CITY
 def createCrimeDrawable():
