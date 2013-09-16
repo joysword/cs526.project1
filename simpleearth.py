@@ -81,7 +81,7 @@ TYPE = set
 	"DOMESTIC VIOLENCE"]
 )
 
-crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'VANDALISM':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
+crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'CRIMINAL DAMAGE':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
 
 class community:
 	name = ''
@@ -513,7 +513,7 @@ for name in ctastops:
 	foo = name.strip(' ()"')
 	bar = foo.partition(', ')
 
-	model = SphereShape.create(50, 4)
+	model = SphereShape.create(50, 3)
 	lat = float(bar[0]) * math.pi/180
 	lon = float(bar[2]) * math.pi/180
 
@@ -555,7 +555,6 @@ for seg in ctaread:
 		elif i==1:
 			coo = seg[i].split(',')
 			oldPos = llh2ecef(float(coo[1]),float(coo[0]), 0.0)
-			print oldPos
 		else:
 			coo = seg[i].split(',')
 			pos = llh2ecef(float(coo[1]),float(coo[0]), 0.0)
@@ -567,31 +566,56 @@ for seg in ctaread:
 	all.addChild(xLine)
 f.close()
 
-# SIN CITY
-def createCrimeDrawable():
-	return BoxShape.create(15,15,15)
+# GET TRAIN LOCATION FROM CTA
+def getTrainInfo():
+	for i in range(0,nodeTrainParent.numChildren()):
+		nodeTrainParent.removeChildByIndex(i)
 
-sincity="""
+	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
+	root = ET.fromstring(train_xml)
+	for route in root:
+		for train in route:
+			lat = float(train.find('lat').text)
+			lon = float(train.find('lon').text)
+			heading = float(train.find('heading').text)
+			pos = llh2ecef(lat, lon, 100.0)
+			model = BoxShape.create(100,20,200)
+			model.setBoundingBoxVisible(True)
+			model.setPosition(pos[0],pos[1],pos[2])
+			model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
+			model.setEffect('colored -d blue')
+			nodeTrainParent.addChild(model)
+
+# SIN CITY
+#sincity="""
 nodeComm = [None]*78
 nodeYear = [None]*14
 nodeCrime = [None]*11
 
-for i in range(1,78):
+nodeSinCityParent = SceneNode.create('SIN CITY')
+all.addChild(nodeSinCityParent)
+
+for i in range(0,78):
 	name = "comm"+str(i)
 	nodeComm[i] = SceneNode.create(name)
-	all.addChild(nodeComm[i])
-	for j in range(1,14):
+	nodeSinCityParent.addChild(nodeComm[i])
+	for j in range(0,14):
 		name1 = name+"year"+str(2000+j)
-		nodeYear[j] = nodeCom[i].addChild(SceneNode.create(name1))
+		nodeYear[j] = SceneNode.create(name1)
+		nodeComm[i].addChild(nodeYear[j])
 		for k in range(0,11):
 			name2 = name1+"crimetype"+str(k)
-			nodeCrime[k] = nodeYear[j].addChild(SceneNode.create(name2))
+			nodeCrime[k] = SceneNode.create(name2)
+			nodeYear[j].addChild(nodeCrime[k])
 
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
 lines = csv.reader(f)
 count = 0
+atLine = 0
 for items in lines:
+	atLine+=1
+	print "line %d" %(atLine)
 	crime_type = items[2]
 	crime_comm = int(items[4])
 	crime_year = int(items[5])
@@ -600,23 +624,23 @@ for items in lines:
 	
 	pos = llh2ecef(crime_lat, crime_lon, 8.0)
 
-	model = createCrimeDrawable()
+	model = SphereShape.create(25,3)
 	model.setPosition(pos)
 	#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
-	model.setEffect('colored -d blue')
-	nodeYear[crime_year-2000].getChildByIndex(crime_comm).getChildByIndex(crimeType[crime_type]).addChild(model)
+	model.setEffect('colored -d red')
+	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(model)
 	count+=1
-	# TO DO ELSE
+
 f.close()
 
 print "total number of crime is %d" %(count)
 
-for i in range(1,14):
-	nodeYear[i].setChildrenVisible(False)
+for i in range(1,78):
+	nodeComm[i].setChildrenVisible(False)
 
 #nodeYear[13].setChildrenVisible(True)
 #print "2013 visible"
-"""
+#"""
 
 # since the scale here is pretty large stereo doesnt help much
 # so lets start with it turned off
@@ -629,6 +653,7 @@ for i in range(1,14):
 
 # TEST FACE CAMERA
 testObject = PlaneShape.create(20, 20)
+testObject.setEffect("colored -d red")
 all.addChild(testObject)
 caveutil.caveutil.positionAtHead (cam, testObject, 2)
 
@@ -697,6 +722,7 @@ def onEvent():
 		wandOri = e.getOrientation()
 		cam.setOrientation( cam.getOrientation() + (wandOri-wandOldOrientation)*0.01 )
 
+trainDeltaT = 0
 def onUpdate(frame, t, dt):
 	d = cam.getPosition()
 	d0 = float(d.x)
@@ -706,6 +732,10 @@ def onUpdate(frame, t, dt):
 	if r<500:
 		r=500
 	cam.getController().setSpeed(r)
+
+	if (t-trainDeltaT>=3):
+		trainDeltaT = t
+		getTrainInfo()
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
@@ -1017,25 +1047,8 @@ def clickYear(year):
 					else:
 						nodeComm[com].setVisible(True)
 
-# GET TRAIN LOCATION FROM CTA
-def getTrainInfo():
-
-	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
-	root = ET.fromstring(train_xml)
-	for route in root:
-		for train in route:
-			lat = float(train.find('lat').text)
-			lon = float(train.find('lon').text)
-			heading = float(train.find('heading').text)
-			pos = llh2ecef(lat, lon, 100.0)
-			model = BoxShape.create(100,20,200)
-			model.setBoundingBoxVisible(True)
-			model.setPosition(pos[0],pos[1],pos[2])
-			model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
-			model.setEffect('colored -d blue')
-			all.addChild(model)
-
-getTrainInfo()
+nodeTrainParent = SceneNode.create("allTrain")
+all.addChild(nodeTrainParent)
 
 never ="""
 												!!!KIDNAPPING : 165
