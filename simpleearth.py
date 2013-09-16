@@ -14,9 +14,6 @@ import urllib2
 
 def testfunc():
 	print "test"
-# radius of the globe
-#radius = 6356752.5 + 0000.0
-#radius = 6378137
 
 #different radiuses
 r_a = 6378137.0
@@ -29,6 +26,7 @@ wgs84_e2 = 0.0066943799901975848
 wgs84_a2 = wgs84_a**2 #to speed things up a bit
 wgs84_b2 = wgs84_b**2
 
+# coordinate system conversion
 def llh2ecef(lat, lon, alt):
 	lat *= (math.pi / 180.0)
 	lon *= (math.pi / 180.0)
@@ -83,19 +81,7 @@ TYPE = set
 	"DOMESTIC VIOLENCE"]
 )
 
-btn_allcrime = Button.create(cc)
-btn_homicide = Button.create(cc)
-btn_kidnap = Button.create(cc)
-btn_robbery = Button.create(cc)
-btn_burglary = Button.create(cc)
-btn_gta = Button.create(cc)
-btn_vandalism = Button.create(cc)
-btn_arson = Button.create(cc)
-btn_theft = Button.create(cc)
-btn_assault = Button.create(cc)
-btn_sex = Button.create(cc)
-
-crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'VANDALISM':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9 'CRIM SEXUAL ASSAULT':10}
+crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'VANDALISM':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
 
 class community:
 	name = ''
@@ -383,7 +369,7 @@ menu1_1filter = menu0_chicago.addSubMenu("FILTER CRIME TYPES")
 
 cc = menu1_1filter.getContainer()
 
-btnCrime[None]*11
+btnCrime = [None]*11
 
 for i in range(0,11):
 	btnCrime[i] = Button.create(cc)
@@ -404,6 +390,28 @@ btnCrime[9].setText("Aggravated Assault")
 btnCrime[10].setText("Aggravated Sexual Assault")
 
 btnCrime[crimeType['ALL']].setChecked(True)
+
+menu1_2filter = menu0_chicago.addSubMenu("FILTER YEARS")
+
+cc = menu1_2filter.getContainer()
+
+btnYear = [None]*14
+
+for ii in range(0,14):
+	if (ii==0):
+		btnYear[0] = Button.create(cc)
+		btnYear[0].setCheckable(True)
+		btnYear[0].setChecked(False)
+		btnYear[0].setUIEventCommand('clickYear(ii)')
+		btnYear[0].setText("ALL YEARS")
+	else:
+		i = 14-ii
+		btnYear[i] = Button.create(cc)
+		btnYear[i].setCheckable(True)
+		btnYear[i].setChecked(False)
+		btnYear[i].setUIEventCommand('clickYear(i)')
+		btnYear[i].setText(str(2000+i))
+
 
 menu1_2simu = menu0_chicago.addSubMenu("REAL TIME WATCH")
 
@@ -545,21 +553,21 @@ all.addChild(xLine)
 def createCrimeDrawable():
 	return BoxShape.create(15,15,15)
 
-#sincity="""
-nodeYear = [None]*14
+sincity="""
 nodeComm = [None]*78
-nodeCrimeType = [None]*11
+nodeYear = [None]*14
+nodeCrime = [None]*11
 
-for i in range(1,14):
-	name = "year"+str(2000+i)
-	nodeYear[i] = SceneNode.create(name)
-	all.addChild(nodeYear[i])
-	for j in range(0,78):
-		name1 = name+"comm"+str(j)
-		nodeComm[j] = nodeYear[i].addChild(SceneNode.create(name1))
+for i in range(1,78):
+	name = "comm"+str(i)
+	nodeComm[i] = SceneNode.create(name)
+	all.addChild(nodeComm[i])
+	for j in range(1,14):
+		name1 = name+"year"+str(2000+j)
+		nodeYear[j] = nodeCom[i].addChild(SceneNode.create(name1))
 		for k in range(0,11):
 			name2 = name1+"crimetype"+str(k)
-			nodeCrimeType[k] = nodeComm[j].addChild(SceneNode.create(name2))
+			nodeCrime[k] = nodeYear[j].addChild(SceneNode.create(name2))
 
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
@@ -590,7 +598,7 @@ for i in range(1,14):
 
 #nodeYear[13].setChildrenVisible(True)
 #print "2013 visible"
-#"""
+"""
 
 # since the scale here is pretty large stereo doesnt help much
 # so lets start with it turned off
@@ -908,18 +916,19 @@ conditionstat="""
 							print btn_77.getText();
 """
 
-## HOW TO FILTER CRIME TYPES
+# HOW TO FILTER CRIME TYPES AND YEARS
 
 notCrime = set()
-notYear = set()moule
+notYear = set()
 notCom = set()
 
+## CLICK CRIME TYPE FILTER BUTTONS
 def clickCrime(crime):
 	if crime==0:
 		if btnCrime[0].isChecked()==False: # if we want to show all
 			btnCrime[0].setChecked(True)
 			notCrime.clear()
-			for j in range(1:11):
+			for j in range(1,11):
 				if btnCrime[j].isChecked()==False:
 					notCrime.add(j)
 					clickCrime(j)
@@ -927,13 +936,15 @@ def clickCrime(crime):
 			btnCrime[0].setChecked(False)
 			for j in notCrime:
 				clickCrime(j)
-	else: # individual crime type 
+	else: # individual crime type
+		if btnCrime[0].isChecked():
+			return 0
 		if (btnCrime[crime].isChecked()): # if we want to uncheck this crime
 			btnCrime[crime].setChecked(False)
-			for year in range(1,14):
-				for com in range(1,78):
-					n = nodeYear[year].getChildByIndex(com)
-					if nodeYear[year].isVisible() and n.isVisible():
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					if nodeComm[com].isVisible() and n.isVisible():
 						n.getChildByIndex(crime).setVisible(False)
 						n.getChildByIndex(crime).setChildrenVisible(False)
 					else:
@@ -941,21 +952,22 @@ def clickCrime(crime):
 
 		else: # if we want to check this crime
 			btnCrime[crime].setChecked(True)
-			for year in range(1,14):
-				for com in range(1,78):
-					n = nodeYear[year].getChildByIndex(com)
-					if nodeYear[year].isVisible() and n.isVisible():
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					if nodeComm[com].isVisible() and n.isVisible():
 						n.getChildByIndex(crime).setVisible(True)
 						n.getChildByIndex(crime).setChildrenVisible(True)
 					else:
 						n.getChildByIndex(crime).setVisible(True)
 
+## CLICK YEAR FILTER BUTTONS
 def clickYear(year):
 	if year==0:
 		if btnYear[0].isChecked()==False: # if we want to show all
 			btnYear[0].setChecked(True)
 			notYear.clear()
-			for j in range(1:14):
+			for j in range(1,14):
 				if btnYear[j].isChecked()==False:
 					notYear.add(j)
 					clickYear(j)
@@ -964,28 +976,30 @@ def clickYear(year):
 			for j in notYear:
 				clickYear(j)
 	else: # individual year
+		if btnYear[0].isChecked():
+			return 0
 		if (btnYear[year].isChecked()): # if we want to uncheck this year
 			btnYear[year].setChecked(False)
 			for com in range(1,78):
 				for crime in range(1,11):
-					n = nodeYear[year].getChildByIndex(com).getChildByIndex(crime)
-					if nodeYear[year].getChildByIndex(com).isVisible() and n.isVisible():
-						nodeYear[year].setVisible(False)
+					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
+					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
+						nodeComm[com].setVisible(False)
 						n.setChildrenVisible(False)
 					else:
-						nodeYear[year].setVisible(False)
+						nodeComm[com].setVisible(False)
 		else: # if we want to check this year
 			btnCrime[crime].setChecked(True)
 			for com in range(1,78):
 				for crime in range(1,11):
-					n = nodeYear[year].getChildByIndex(com).getChildByIndex(crime)
-					if nodeYear[year].getChildByIndex(com).isVisible() and n.isVisible():
-						nodeYear[year].setVisible(True)
+					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
+					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
+						nodeComm[com].setVisible(True)
 						n.setChildrenVisible(True)
 					else:
-						nodeYear[year].setVisible(True)
+						nodeComm[com].setVisible(True)
 
-#GET TRAIN LOCATION FROM CTA
+# GET TRAIN LOCATION FROM CTA
 def getTrainInfo():
 
 	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
