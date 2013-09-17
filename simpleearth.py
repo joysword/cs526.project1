@@ -4,6 +4,7 @@ from omegaToolkit import *
 from euclid import *
 import csv
 import caveutil
+import sprite
 
 try:
 	import xml.etree.cElementTree as ET
@@ -366,16 +367,13 @@ btn_54 = menu1_0_9.addButton("Riverdale", "goCommunities(54)")
 btn_55 = menu1_0_9.addButton("Hegewisch", "goCommunities(55)")
 
 menu1_1filter = menu0_chicago.addSubMenu("FILTER CRIME TYPES")
-
 cc = menu1_1filter.getContainer()
-
 btnCrime = [None]*11
-
 for i in range(0,11):
 	btnCrime[i] = Button.create(cc)
 	btnCrime[i].setCheckable(True)
-	btnCrime[i].setChecked(False)
-	btnCrime[i].setUIEventCommand('clickCrime(i)')
+	btnCrime[i].setChecked(True)
+	btnCrime[i].setUIEventCommand('clickCrime('+str(i)+')')
 
 btnCrime[0].setText("ALL MAJOR CRIMES")
 btnCrime[1].setText("Homicide")
@@ -389,32 +387,26 @@ btnCrime[8].setText("Theft (over $500)")
 btnCrime[9].setText("Aggravated Assault")
 btnCrime[10].setText("Aggravated Sexual Assault")
 
-btnCrime[crimeType['ALL']].setChecked(True)
-
 menu1_2filter = menu0_chicago.addSubMenu("FILTER YEARS")
-
 cc = menu1_2filter.getContainer()
-
 btnYear = [None]*14
-
 for ii in range(0,14):
 	if (ii==0):
 		btnYear[0] = Button.create(cc)
 		btnYear[0].setCheckable(True)
 		btnYear[0].setChecked(False)
-		btnYear[0].setUIEventCommand('clickYear(ii)')
+		btnYear[0].setUIEventCommand('clickYear(0)')
 		btnYear[0].setText("ALL YEARS")
 	else:
 		i = 14-ii
 		btnYear[i] = Button.create(cc)
 		btnYear[i].setCheckable(True)
 		btnYear[i].setChecked(False)
-		btnYear[i].setUIEventCommand('clickYear(i)')
+		btnYear[i].setUIEventCommand('clickYear('+str(i)+')')
 		btnYear[i].setText(str(2000+i))
-
+btnYear[13].setChecked(True)
 
 menu1_2simu = menu0_chicago.addSubMenu("REAL TIME WATCH")
-
 cc = menu1_2simu.getContainer()
 label_simu = Label.create(cc)
 label_simu.setText("TEST SIMULATION")
@@ -493,6 +485,12 @@ else:
 #all.addChild(torus2)
 #torus2.setVisible(False)
 
+#crime models
+spriteSize = sprite.createSizeUniform()
+#spriteSize.setFloat(0.1)
+spriteWindowSize = sprite.createWindowSizeUniform()
+spriteWindowSize.setVector2f(Vector2(854, 480))
+
 setNearFarZ(1, 20 * r_a)
 
 cam = getDefaultCamera()
@@ -568,7 +566,8 @@ f.close()
 
 # GET TRAIN LOCATION FROM CTA
 def getTrainInfo():
-	for i in range(0,nodeTrainParent.numChildren()):
+	num = nodeTrainParent.numChildren()
+	for i in range(0,num):
 		nodeTrainParent.removeChildByIndex(i)
 
 	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
@@ -582,12 +581,13 @@ def getTrainInfo():
 			model = BoxShape.create(100,20,200)
 			model.setBoundingBoxVisible(True)
 			model.setPosition(pos[0],pos[1],pos[2])
-			model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
+			model.lookAt(model.convertWorldToLocalPosition(Vector3(0,0,0)), model.convertWorldToLocalPosition(Vector3(pos[0],pos[1],pos[2])))
 			model.setEffect('colored -d blue')
 			nodeTrainParent.addChild(model)
 
 # SIN CITY
 #sincity="""
+
 nodeComm = [None]*78
 nodeYear = [None]*14
 nodeCrime = [None]*11
@@ -598,10 +598,12 @@ all.addChild(nodeSinCityParent)
 for i in range(0,78):
 	name = "comm"+str(i)
 	nodeComm[i] = SceneNode.create(name)
+	nodeComm[i].setVisible(True)
 	nodeSinCityParent.addChild(nodeComm[i])
 	for j in range(0,14):
 		name1 = name+"year"+str(2000+j)
 		nodeYear[j] = SceneNode.create(name1)
+		nodeYear[j].setVisible(True)
 		nodeComm[i].addChild(nodeYear[j])
 		for k in range(0,11):
 			name2 = name1+"crimetype"+str(k)
@@ -609,38 +611,39 @@ for i in range(0,78):
 			nodeYear[j].addChild(nodeCrime[k])
 
 count = 0
-f = open('CrimesAll_final.csv', 'rb')
+f = open('Crimes2013_final.csv', 'rb')
+
 lines = csv.reader(f)
-count = 0
 atLine = 0
 for items in lines:
 	atLine+=1
-	print "line %d" %(atLine)
 	crime_type = items[2]
 	crime_comm = int(items[4])
-	crime_year = int(items[5])
-	crime_lat = float(items[6])
-	crime_lon = float(items[7])
-	
-	pos = llh2ecef(crime_lat, crime_lon, 8.0)
+	#crime_year = int(items[5])
+	#crime_lat = float(items[6])
+	#crime_lon = float(items[7])
 
-	model = SphereShape.create(25,3)
-	model.setPosition(pos)
+	crime_year = 2013
+	crime_lat = float(items[5])
+	crime_lon = float(items[6])
+	
+	pos = llh2ecef(crime_lat, crime_lon, 100.0)
+
+	spritePath = "icon/"+str(crimeType[crime_type])+".png"
+	crimeIcon = sprite.createSprite(spritePath, spriteSize, spriteWindowSize, True)
+	crimeIcon.setPosition(pos)
+	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(crimeIcon)
+	
+	#model = StaticObject.create(25,3)
+	#model.setPosition(pos)
 	#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
-	model.setEffect('colored -d red')
-	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(model)
-	count+=1
+	#model.setEffect('colored -d red')
+	#nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(model)
+
+	if (atLine>50):
+		break
 
 f.close()
-
-print "total number of crime is %d" %(count)
-
-for i in range(1,78):
-	nodeComm[i].setChildrenVisible(False)
-
-#nodeYear[13].setChildrenVisible(True)
-#print "2013 visible"
-#"""
 
 # since the scale here is pretty large stereo doesnt help much
 # so lets start with it turned off
@@ -722,7 +725,27 @@ def onEvent():
 		wandOri = e.getOrientation()
 		cam.setOrientation( cam.getOrientation() + (wandOri-wandOldOrientation)*0.01 )
 
+burning = """
+	elif e.isKeyDown(ord('j')):
+		cam.setPosition( cam.convertLocalToWorldPosition(cam.getPosition() + Vector3(-1,0,0)*100 )
+	elif e.isKeyDown(ord('l')):
+		cam.setPosition( cam.getPosition() + Vector3(1,0,0)*100 )
+	elif e.isKeyDown(ord('i')):
+		cam.setPosition( cam.getPosition() + Vector3(0,0,-1)*100 )
+	elif e.isKeyDown(ord('k')):
+		cam.setPosition( cam.getPosition() + Vector3(0,0,1)*100 )
+	elif e.isKeyDown(ord('y')):
+		cam.setPosition( cam.getPosition() + Vector3(0,1,0)*100 )
+	elif e.isKeyDown(ord('h')):
+		cam.setPosition( cam.getPosition() + Vector3(0,-1,0)*100 )
+	#elif e.isKeyDown(ord('x')):
+	#	cam.setOrientation( cam.getOrientation() + Vector3() )
+	#elif e.isKeyDown(ord('e')):
+	#	cam.setOrientation( cam.getOrientation() + Vector3() )
+"""
+
 trainDeltaT = 0
+
 def onUpdate(frame, t, dt):
 	d = cam.getPosition()
 	d0 = float(d.x)
@@ -734,6 +757,7 @@ def onUpdate(frame, t, dt):
 	cam.getController().setSpeed(r)
 
 	if (t-trainDeltaT>=3):
+		print "updating CTA trains"
 		trainDeltaT = t
 		getTrainInfo()
 
@@ -973,22 +997,31 @@ notCom = set()
 ## CLICK CRIME TYPE FILTER BUTTONS
 def clickCrime(crime):
 	if crime==0:
-		if btnCrime[0].isChecked()==False: # if we want to show all
-			btnCrime[0].setChecked(True)
+		if btnCrime[0].isChecked(): # if we want to show all
 			notCrime.clear()
 			for j in range(1,11):
 				if btnCrime[j].isChecked()==False:
-					notCrime.add(j)
+					notCrime.add(j) # collect all crimes currently not checked
+					btnCrime[j].setChecked(True)
 					clickCrime(j)
 		else: # if we want to quit show all
-			btnCrime[0].setChecked(False)
 			for j in notCrime:
+				btnCrime[j].setChecked(False)
 				clickCrime(j)
 	else: # individual crime type
-		if btnCrime[0].isChecked():
-			return 0
-		if (btnCrime[crime].isChecked()): # if we want to uncheck this crime
-			btnCrime[crime].setChecked(False)
+		if btnCrime[crime].isChecked(): # if we want to check this crime
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					if nodeComm[com].isVisible() and n.isVisible():
+						n.getChildByIndex(crime).setVisible(True)
+						n.getChildByIndex(crime).setChildrenVisible(True)
+					else:
+						n.getChildByIndex(crime).setVisible(True)
+		else: # if we want to uncheck this crime
+			if btnCrime[0].isChecked(): # nothing happens
+				btnCrime[crime].setChecked(True)
+				return 0
 			for com in range(1,78):
 				for year in range(1,14):
 					n = nodeComm[com].getChildByIndex(year)
@@ -998,46 +1031,22 @@ def clickCrime(crime):
 					else:
 						n.getChildByIndex(crime).setVisible(False)
 
-		else: # if we want to check this crime
-			btnCrime[crime].setChecked(True)
-			for com in range(1,78):
-				for year in range(1,14):
-					n = nodeComm[com].getChildByIndex(year)
-					if nodeComm[com].isVisible() and n.isVisible():
-						n.getChildByIndex(crime).setVisible(True)
-						n.getChildByIndex(crime).setChildrenVisible(True)
-					else:
-						n.getChildByIndex(crime).setVisible(True)
-
 ## CLICK YEAR FILTER BUTTONS
 def clickYear(year):
 	if year==0:
-		if btnYear[0].isChecked()==False: # if we want to show all
-			btnYear[0].setChecked(True)
+		if btnYear[0].isChecked(): # if we want to show all
 			notYear.clear()
 			for j in range(1,14):
 				if btnYear[j].isChecked()==False:
-					notYear.add(j)
+					notYear.add(j) # collect all years currently not checked
+					btnYear[j].setChecked(True)
 					clickYear(j)
 		else: # if we want to quit show all
-			btnYear[0].setChecked(False)
 			for j in notYear:
+				btnCrime[j].setChecked(False)
 				clickYear(j)
 	else: # individual year
-		if btnYear[0].isChecked():
-			return 0
-		if (btnYear[year].isChecked()): # if we want to uncheck this year
-			btnYear[year].setChecked(False)
-			for com in range(1,78):
-				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
-					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
-						nodeComm[com].setVisible(False)
-						n.setChildrenVisible(False)
-					else:
-						nodeComm[com].setVisible(False)
-		else: # if we want to check this year
-			btnCrime[crime].setChecked(True)
+		if btnYear[year].isChecked(): # if we want to check this year
 			for com in range(1,78):
 				for crime in range(1,11):
 					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
@@ -1046,34 +1055,46 @@ def clickYear(year):
 						n.setChildrenVisible(True)
 					else:
 						nodeComm[com].setVisible(True)
+		else: # if we want to uncheck this year
+			if btnYear[0].isChecked(): # nothing happens
+				btnCrime[year].setChecked(True)
+				return 0
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
+					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
+						nodeComm[com].setVisible(False)
+						n.setChildrenVisible(False)
+					else:
+						nodeComm[com].setVisible(False)
 
 nodeTrainParent = SceneNode.create("allTrain")
 all.addChild(nodeTrainParent)
 
 never ="""
-												!!!KIDNAPPING : 165
+												!!!KIDNAPPING : 165 (ICON USING OTHERS)
 		INTERFERE WITH PUBLIC OFFICER : 0
 		PUBLIC PEACE VIOLATION : 2077
 		INTERFERENCE WITH PUBLIC OFFICER : 845
 	???PROSTITUTION : 1115 (ICON)
 		LIQUOR LAW VIOLATION : 314
 		RITUALISM : 0
-															!!!ROBBERY : 7314 (7379) (ICON)
-															BURGLARY (FORCIBLE ENTRY): 10915 (7272) (ICON)
+															!!!ROBBERY : 7314 (7379) (ICON GET)
+															BURGLARY (FORCIBLE ENTRY): 10915 (7272) (ICON GET)
 !!!WEAPONS VIOLATION : 2125 (ICON)
 		OTHER NARCOTIC VIOLATION : 2
-												!!!HOMICIDE : 269 (273) (ICON)
+												!!!HOMICIDE : 269 (273) (ICON GET)
 		OBSCENITY : 16
 		OFFENSES INVOLVING CHILDREN : 0
 		OTHER OFFENSE : 11619
-																???CRIMINAL DAMAGE (TO CITY OF CHICAGO PROPERTY, *VANDALISM): 19193 (434) (ICON)
-															!!!MOTOR VEHICLE THEFT : 8276 (ICON)
-															???THEFT (over $500): 42018 (8944) (ICON)
+																???CRIMINAL DAMAGE (TO CITY OF CHICAGO PROPERTY, *VANDALISM): 19193 (434) (ICON GET)
+															!!!MOTOR VEHICLE THEFT : 8276 (ICON GET)
+															???THEFT (over $500): 42018 (8944) (ICON GET)
 		OFFENSE INVOLVING CHILDREN : 1453
 		GAMBLING : 430
 		PUBLIC INDECENCY : 6
 		NON-CRIMINAL (SUBJECT SPECIFIED) : 0
-												!!!ARSON : 261 (ICON)
+												!!!ARSON : 261 (ICON GET)
 		INTIMIDATION : 93
 		SEX OFFENSE : 616
 		NARCOTICS : 22027
@@ -1081,8 +1102,8 @@ never ="""
 		BATTERY : 35456
 		CRIMINAL TRESPASS : 5208
 		STALKING : 81
-																ASSAULT (AGGRAVATED*): 11297 (2479) (ICON)
-												CRIM SEXUAL ASSAULT (AGGRAVATED*): 761 (190) (ICON)
+																ASSAULT (AGGRAVATED*): 11297 (2479) (ICON GET)
+												CRIM SEXUAL ASSAULT (AGGRAVATED*): 761 (190) (ICON GET)
 		NON-CRIMINAL : 3
 		DOMESTIC VIOLENCE : 0
 """
