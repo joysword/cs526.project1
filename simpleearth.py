@@ -566,12 +566,13 @@ f.close()
 
 # GET TRAIN LOCATION FROM CTA
 def getTrainInfo():
-	num = nodeTrainParent.numChildren()
-	for i in range(0,num):
-		nodeTrainParent.removeChildByIndex(i)
-
 	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
 	root = ET.fromstring(train_xml)
+
+	num = nodeTrainParent.numChildren()
+	for i in range(0,num):
+		nodeTrainParent.removeChildByIndex(0)
+	
 	for route in root:
 		for train in route:
 			lat = float(train.find('lat').text)
@@ -579,10 +580,10 @@ def getTrainInfo():
 			heading = float(train.find('heading').text)
 			pos = llh2ecef(lat, lon, 100.0)
 			model = BoxShape.create(100,20,200)
-			model.setBoundingBoxVisible(True)
+			#model.setBoundingBoxVisible(True)
 			model.setPosition(pos[0],pos[1],pos[2])
-			model.lookAt(model.convertWorldToLocalPosition(Vector3(0,0,0)), model.convertWorldToLocalPosition(Vector3(pos[0],pos[1],pos[2])))
-			model.setEffect('colored -d blue')
+			#model.lookAt(model.convertWorldToLocalPosition(Vector3(0,0,0)), model.convertWorldToLocalPosition(Vector3(pos[0],pos[1],pos[2])))
+			model.setEffect('colored -d white')
 			nodeTrainParent.addChild(model)
 
 # SIN CITY
@@ -747,6 +748,8 @@ burning = """
 trainDeltaT = 0
 
 def onUpdate(frame, t, dt):
+	global trainDeltaT
+
 	d = cam.getPosition()
 	d0 = float(d.x)
 	d1 = float(d.y)
@@ -756,7 +759,7 @@ def onUpdate(frame, t, dt):
 		r=500
 	cam.getController().setSpeed(r)
 
-	if (t-trainDeltaT>=3):
+	if (t-trainDeltaT>=10):
 		print "updating CTA trains"
 		trainDeltaT = t
 		getTrainInfo()
