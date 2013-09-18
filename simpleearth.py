@@ -3,7 +3,7 @@ from cyclops import *
 from omegaToolkit import *
 from euclid import *
 import csv
-import caveutil
+from caveutil import *
 import sprite
 
 try:
@@ -89,6 +89,7 @@ class community:
 	lat = 0
 	lon = 0
 	pos = Vector3()
+	numCrime = [[0]*11]*14
 	def __init__(self, n, x, y):
 		self.name = n
 		self.lat = x
@@ -436,12 +437,18 @@ torusModel.name = "earth"
 torusModel2 = ModelInfo()
 torusModel2.name = "map"
 
-if caveutil.caveutil.isCAVE() == False:
-	torusModel2.path = "annotation.earth"
+torusModel3 = ModelInfo()
+torusModel3.name = 'yahoo_aerial'
+
+torusModel4 = ModelInfo()
+torusModel4.name = 'yahoo_maps'
+
+if caveutil.isCAVE() == False:
+	torusModel2.path = "simple.earth"
 	#laptop: it works!
 	#cave:
 
-	torusModel.path = "annotation.earth"
+	torusModel.path = "simple.earth"
 	#laptop:it works!
 	#cave: failed to load jpeg and tiff
 
@@ -454,13 +461,13 @@ if caveutil.caveutil.isCAVE() == False:
 #cave: failed
 
 else:
-	#torusModel2.path = "openstreetmap.earth"
-	torusModel2.path = "annotation.earth"
+	torusModel2.path = "openstreetmap.earth"
+	#torusModel2.path = "simple.earth"
 	#laptop: crash when start
 	#cave: it works!
 
-	#torusModel.path = "mapquestaerial.earth"
-	torusModel.path = "annotation.earth"
+	torusModel.path = "mapquestaerial.earth"
+	#torusModel.path = "simple.earth"
 	#laptop: crash when start
 	#cave: it works!
 
@@ -476,14 +483,14 @@ else:
 #scene.loadModel(torusModel2)
 
 # Create a scene object using the loaded model
-#torus1 = StaticObject.create("earth")
-#torus1.getMaterial().setLit(False)
+torus1 = StaticObject.create("earth")
+torus1.getMaterial().setLit(False)
 #all.addChild(torus1)
 
-#torus2 = StaticObject.create("map")
-#torus2.getMaterial().setLit(False)
-#all.addChild(torus2)
-#torus2.setVisible(False)
+torus2 = StaticObject.create("map")
+torus2.getMaterial().setLit(False)
+all.addChild(torus2)
+torus2.setVisible(False)
 
 #crime models
 spriteSize = sprite.createSizeUniform()
@@ -502,32 +509,40 @@ cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 # set a fast speed for travel by default
 cam.getController().setSpeed(10000)
 
+interp = InterpolActor(cam)
+interp.setTransitionType(InterpolActor.SMOOTH)
+interp.setDuration(3)
+interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
+
 # CTA stops
-f = open('CTA_L_Stops')
-ctastops = [line.rstrip('\n') for line in f]
-
-for name in ctastops:
-	#print name
-	foo = name.strip(' ()"')
-	bar = foo.partition(', ')
-
+f = open('CHICAGO_DATA/cta_L_stops/cta_L_stops_final.csv')
+ctastops = csv.reader(f)
+for stop in ctastops:
+	
 	model = SphereShape.create(50, 3)
-	lat = float(bar[0]) * math.pi/180
-	lon = float(bar[2]) * math.pi/180
 
-	#radius = getRadius(lat, r_a, r_b)
-
-	pos = llh2ecef(float(bar[0]), float(bar[2]), 0.0)
+	pos = llh2ecef(float(stop[1]), float(stop[0]), 0.0)
 	model.setPosition(pos)
 	model.setEffect('colored -d white')
-	all.addChild(model)
-f.close()
 
+	text = Text3D.create('font/helvetica.ttf', 15, stop[2])
+	caveutil.orientWithHead(cam, text)
+	text.roll(math.pi/4)
+
+	posText = llh2ecef(float(stop[1]), float(stop[0]), 100.0)
+	text.setPosition(posText)
+	text.setFixedSize(True)
+	text.setColor(Color('#8080FF'))
+
+	all.addChild(model)
+	all.addChild(text)
+
+f.close()
 
 # CTA lines
 f = open('CHICAGO_DATA/CTARailLines.csv','rb')
-ctaread = csv.reader(f)
-for seg in ctaread:
+ctaLines = csv.reader(f)
+for seg in ctaLines:
 	xLine = LineSet.create()
 	oldPos = Vector3()
 	for i in range(0,len(seg)):
@@ -634,21 +649,33 @@ for items in lines:
 	crimeIcon = sprite.createSprite(spritePath, spriteSize, spriteWindowSize, True)
 	crimeIcon.setPosition(pos)
 	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(crimeIcon)
-	
+	comm[crime_comm].numCrime[crime_year-2000][crimeType[crime_type]]+=1
+
 	#model = StaticObject.create(25,3)
 	#model.setPosition(pos)
 	#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
 	#model.setEffect('colored -d red')
 	#nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(model)
 
-	if (atLine>50):
+	if (atLine>100):
 		break
 
 f.close()
 
+# COMMUNITY LABELS
+for i in range(1,78):
+	labelComm = Text3D.create('font/Franchise-Bold-hinted.ttf', 40, comm[i].name+' ('+str(comm[i].numCrime[13][1])+')') # TO DO : change the value
+	caveutil.orientWithHead(cam, labelComm)
+
+	posComm = llh2ecef(comm[i].lat, comm[i].lon, 300.0)
+	labelComm.setPosition(posComm)
+	labelComm.setFixedSize(True)
+	labelComm.setColor(Color('#cccccc')) # Silver
+	all.addChild(labelComm)
+
 # since the scale here is pretty large stereo doesnt help much
 # so lets start with it turned off
-#toggleStereo()
+toggleStereo()
 
 #put the camera to Chicago
 
@@ -659,7 +686,7 @@ f.close()
 testObject = PlaneShape.create(20, 20)
 testObject.setEffect("colored -d red")
 all.addChild(testObject)
-caveutil.caveutil.positionAtHead (cam, testObject, 2)
+caveutil.positionAtHead (cam, testObject, 2)
 
 d0 = 0
 d1 = 0
@@ -687,14 +714,24 @@ def playBtnUpSound(e):
 	sd.setWidth(20)
 	sd.play()
 
-#uim = UiModule.createAndInitialize()
-#wf = uim.getWidgetFactory()
-#ui = uim.getUi()
+def playMovingSound():
+	sd = SoundInstance(env.loadSoundFromFile("/sound/move.wav"))
+	sd.setPosition( cam.getPosition() )
+	sd.setVolume(1.0)
+	sd.setWidth(20)
+	sd.play()
 
-#newBtn = wf.createButton('testButton', ui)
-#newBtn.setUIEventCommand('testfunc()')
+uim = UiModule.createAndInitialize()
+wf = uim.getWidgetFactory()
+ui = uim.getUi()
 
-#newBtn.setPosition(Vector3(20,20))
+legend = wf.createImage("legend", ui)
+legend.setData(loadImage('icon/1.png'))
+legend.setLayer(WidgetLayer.Front)
+#legend.setSize(Vector2(200,200))
+legend.setPosition(Vector2(854,480)-legend.getSize())
+
+#modelGeom = ModelGeometry.create('model')
 
 def onEvent():
 	global userScaleFactor
@@ -760,9 +797,9 @@ def onUpdate(frame, t, dt):
 	cam.getController().setSpeed(r)
 
 	if (t-trainDeltaT>=10):
-		print "updating CTA trains"
+		print "not updating CTA trains"
 		trainDeltaT = t
-		getTrainInfo()
+		#getTrainInfo()
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
@@ -771,6 +808,21 @@ setUpdateFunction(onUpdate)
 ## HOW TO GO TO A COMMUNITY
 def goCommunities(x):
 	print "going to %s at (%f,%f)" %(comm[x].name, comm[x].lat, comm[x].lon)
+	newLat = comm[x].lat-5/110.94 # 1 lat is 110940 meters, we want 3km south to the particular point
+	newLon = comm[x].lon
+	newPos = llh2ecef(newLat, newLon, 3000) # 5000 meters high
+
+	interp.setTargetPosition(newPos)
+	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+	interp.startInterpolation()
+	playMovingSound()
+
+	#cam.setPosition(newPos)
+	#commPos = llh2ecef(comm[x].lat, comm[x].lon, 0.0)
+	#cam.lookAt(commPos, newPos)
+	#cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+
+	# TO DO show data of this community
 
 conditionstat="""
 	if x<39: # 1 - 38

@@ -139,7 +139,7 @@ class caveutil:
 		if (wandId == caveutil.WAND2):
 			return currentCamera.getOrientation()* caveutil.__wandOrientation2
 		print "caveutil: WAND ID: ", wandId, " unknown"
-		return Quarternion()
+		return Quaternion()
 		
 	@staticmethod
 	## CurrentCamera is usually given getDefaultCamera()

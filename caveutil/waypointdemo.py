@@ -70,7 +70,7 @@ def onEvent():
 	caveutil.update(event, getScene())
 
 	# Press CTRL or DPAD UP button to playback navigation through all the stored waypoints
-	if event.isButtonDown(EventFlags.Ctrl) or event.isButtonDown(EventFlags.ButtonUp):
+	if event.isKeyDown(ord('q')):
 		g_arrayTraversal = 0
 		WaypointTraversalFunc(interp)
 		
@@ -79,15 +79,5 @@ def onEvent():
 		g_positionArray.append(getDefaultCamera().getPosition())
 		g_orientationArray.append(getDefaultCamera().getOrientation())
 		print "SAVE WAYPOINT"
-	
-	if event.isKeyDown(ord('d')):
-		print "SAVE WAYPOINT FILE"
-		pickle.dump(g_positionArray, open("POS.way","wb"))
-		pickle.dump(g_orientationArray, open("ORI.way","wb"))
-		
-	if event.isKeyDown(ord('r')):
-		print "LOAD WAYPOINT FILE"
-		g_positionArray = pickle.load(open("POS.way","rb"))
-		g_orientationArray = pickle.load(open("ORI.way","rb"))
-		
+
 setEventFunction(onEvent)
