@@ -16,11 +16,11 @@ import urllib2
 def testfunc():
 	print "test"
 
-#different radiuses
+# different radiuses
 r_a = 6378137.0
 r_b = 6356752.314245
 
-#WGS84 reference ellipsoid constants
+# WGS84 reference ellipsoid constants
 wgs84_a = 6378137.0
 wgs84_b = 6356752.314245
 wgs84_e2 = 0.0066943799901975848
@@ -40,48 +40,6 @@ def llh2ecef(lat, lon, alt):
 	
 	return Vector3(x,y,z)
 
-TYPE = set
-(
-	["KIDNAPPING",
-	"PUBLIC INDECENCY",
-	"PUBLIC PEACE VIOLATION",
-	"INTERFERENCE WITH PUBLIC OFFICER",
-	"PROSTITUTION",
-	"LIQUOR LAW VIOLATION",
-	"ROBBERY",
-	"BURGLARY",
-	"WEAPONS VIOLATION",
-	"HOMICIDE",
-	"OBSCENITY",
-	"OTHER OFFENSE",
-	"CRIMINAL DAMAGE",
-	"THEFT",
-	"OFFENSE INVOLVING CHILDREN",
-	"GAMBLING",
-	"OTHER NARCOTIC VIOLATION",
-	"ARSON",
-	"OTHER OFFENSE",
-	"NARCOTICS",
-	"SEX OFFENSE",
-	"STALKING",
-	"INTIMIDATION",
-	"DECEPTIVE PRACTICE",
-	"BATTERY",
-	"CRIMINAL TRESPASS",
-	"MOTOR VEHICLE THEFT",
-	"ASSAULT",
-	"CRIM SEXUAL ASSAULT",
-	"NON-CRIMINAL",
-	"INTERFERE WITH PUBLIC OFFICER",
-	"RITUALISM",
-	"OTHER NARCOTIC VIOLATION",
-	"HOMICIDE",
-	"OBSCENITY",
-	"OFFENSES INVOLVING CHILDREN",
-	"NON-CRIMINAL (SUBJECT SPECIFIED)",
-	"DOMESTIC VIOLENCE"]
-)
-
 crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'CRIMINAL DAMAGE':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
 
 class community:
@@ -90,6 +48,7 @@ class community:
 	lon = 0
 	pos = Vector3()
 	numCrime = [[0]*11]*14
+	numCrimeShown = 0
 	def __init__(self, n, x, y):
 		self.name = n
 		self.lat = x
@@ -99,7 +58,6 @@ class community:
 		print ("watching community %s" %(self.name))
 
 comm = [None]*100
-
 comm[1] = community("Rogers Park", 42.01, -87.67)
 comm[2] = community("West Ridge", 42, -87.69)
 comm[3] = community("Uptown", 41.97, -87.66)
@@ -183,7 +141,7 @@ comm[55] = community("Hegewisch", 41.66, -87.55)
 mm = MenuManager.createAndInitialize()
 menu0_chicago = mm.getMainMenu().addSubMenu("Chicago Panel")
 
-menu1_0_comm = menu0_chicago.addSubMenu("GO TO A COMMUNITY")
+menu1_0_comm = menu0_chicago.addSubMenu("WATCH A COMMUNITY")
  
 menu1_0_1 = menu1_0_comm.addSubMenu("Far North Side")
 menu1_0_2 = menu1_0_comm.addSubMenu("Northwest Side")
@@ -195,19 +153,6 @@ menu1_0_7 = menu1_0_comm.addSubMenu("Southwest Side")
 menu1_0_8 = menu1_0_comm.addSubMenu("Far Southwest Side")
 menu1_0_9 = menu1_0_comm.addSubMenu("Far Southeast Side")
 
-#cc = menu1_0_1.getContainer()
-#btn_01 = Button.create(cc)
-#btn_02 = Button.create(cc)
-#btn_03 = Button.create(cc)
-#btn_04 = Button.create(cc)
-#btn_09 = Button.create(cc)
-#btn_10 = Button.create(cc)
-#btn_11 = Button.create(cc)
-#btn_12 = Button.create(cc)
-#btn_13 = Button.create(cc)
-#btn_14 = Button.create(cc)
-#btn_76 = Button.create(cc)
-#btn_77 = Button.create(cc)
 btn_01 = menu1_0_1.addButton("Rogers Park", "goCommunities(1)")
 btn_02 = menu1_0_1.addButton("West Ridge", "goCommunities(2)")
 btn_03 = menu1_0_1.addButton("Uptown", "goCommunities(3)")
@@ -221,13 +166,6 @@ btn_14 = menu1_0_1.addButton("Albany Park", "goCommunities(14)")
 btn_76 = menu1_0_1.addButton("O'Hare", "goCommunities(76)")
 btn_77 = menu1_0_1.addButton("Edgewater", "goCommunities(77)")
 
-#cc = menu1_0_2.getContainer()
-#btn_15 = Button.create(cc)
-#btn_16 = Button.create(cc)
-#btn_17 = Button.create(cc)
-#btn_18 = Button.create(cc)
-#btn_19 = Button.create(cc)
-#btn_20 = Button.create(cc)
 btn_15 = menu1_0_2.addButton("Portage Park", "goCommunities(15)")
 btn_16 = menu1_0_2.addButton("Irving Park", "goCommunities(16)")
 btn_17 = menu1_0_2.addButton("Dunning", "goCommunities(17)")
@@ -235,28 +173,12 @@ btn_18 = menu1_0_2.addButton("Montclare", "goCommunities(18)")
 btn_19 = menu1_0_2.addButton("Belmont Cragin", "goCommunities(19)")
 btn_20 = menu1_0_2.addButton("Hermosa", "goCommunities(20)")
 
-#cc = menu1_0_3.getContainer()
-#btn_05 = Button.create(cc)
-#btn_06 = Button.create(cc)
-#btn_07 = Button.create(cc)
-#btn_21 = Button.create(cc)
-#btn_22 = Button.create(cc)
 btn_05 = menu1_0_3.addButton("North Center", "goCommunities(5)")
 btn_06 = menu1_0_3.addButton("Lake View", "goCommunities(6)")
 btn_07 = menu1_0_3.addButton("Lincoln Park", "goCommunities(7)")
 btn_21 = menu1_0_3.addButton("Avondale", "goCommunities(21)")
 btn_22 = menu1_0_3.addButton("Logan Square", "goCommunities(22)")
 
-#cc = menu1_0_4.getContainer()
-#btn_23 = Button.create(cc)
-#btn_24 = Button.create(cc)
-#btn_25 = Button.create(cc)
-#btn_26 = Button.create(cc)
-#btn_27 = Button.create(cc)
-#btn_28 = Button.create(cc)
-#btn_29 = Button.create(cc)
-#btn_30 = Button.create(cc)
-#btn_31 = Button.create(cc)
 btn_23 = menu1_0_4.addButton("Humboldt Park", "goCommunities(23)")
 btn_24 = menu1_0_4.addButton("West Town", "goCommunities(24)")
 btn_25 = menu1_0_4.addButton("Austin", "goCommunities(25)")
@@ -267,27 +189,10 @@ btn_29 = menu1_0_4.addButton("North Lawndale", "goCommunities(29)")
 btn_30 = menu1_0_4.addButton("South Lawndale", "goCommunities(30)")
 btn_31 = menu1_0_4.addButton("Lower West Side", "goCommunities(31)")
 
-#cc = menu1_0_5.getContainer()
-#btn_08 = Button.create(cc)
-#btn_32 = Button.create(cc)
-#btn_33 = Button.create(cc)
 btn_08 = menu1_0_5.addButton("Near North Side", "goCommunities(8)")
 btn_32 = menu1_0_5.addButton("Loop", "goCommunities(32)")
 btn_33 = menu1_0_5.addButton("Near South Side", "goCommunities(33)")
 
-#cc = menu1_0_6.getContainer()
-#btn_34 = Button.create(cc)
-#btn_35 = Button.create(cc)
-#btn_36 = Button.create(cc)
-#btn_37 = Button.create(cc)
-#btn_38 = Button.create(cc)
-#btn_39 = Button.create(cc)
-#btn_40 = Button.create(cc)
-#btn_41 = Button.create(cc)
-#btn_42 = Button.create(cc)
-#btn_43 = Button.create(cc)
-#btn_60 = Button.create(cc)
-#btn_69 = Button.create(cc)
 btn_34 = menu1_0_6.addButton("Armour Square", "goCommunities(34)")
 btn_35 = menu1_0_6.addButton("Douglas", "goCommunities(35)")
 btn_36 = menu1_0_6.addButton("Oakland", "goCommunities(36)")
@@ -301,19 +206,6 @@ btn_43 = menu1_0_6.addButton("South Shore", "goCommunities(43)")
 btn_60 = menu1_0_6.addButton("Bridgeport", "goCommunities(60)")
 btn_69 = menu1_0_6.addButton("Greater Grand Crossing", "goCommunities(69)")
 
-#cc = menu1_0_7.getContainer()
-#btn_56 = Button.create(cc)
-#btn_57 = Button.create(cc)
-#btn_58 = Button.create(cc)
-#btn_59 = Button.create(cc)
-#btn_61 = Button.create(cc)
-#btn_62 = Button.create(cc)
-#btn_63 = Button.create(cc)
-#btn_64 = Button.create(cc)
-#btn_65 = Button.create(cc)
-#btn_66 = Button.create(cc)
-#btn_67 = Button.create(cc)
-#btn_68 = Button.create(cc)
 btn_56 = menu1_0_7.addButton("Garfield Ridge", "goCommunities(56)")
 btn_57 = menu1_0_7.addButton("Archer Heights", "goCommunities(57)")
 btn_58 = menu1_0_7.addButton("Brighton Park", "goCommunities(58)")
@@ -327,13 +219,6 @@ btn_66 = menu1_0_7.addButton("Chicago Lawn", "goCommunities(66)")
 btn_67 = menu1_0_7.addButton("West Englewood", "goCommunities(67)")
 btn_68 = menu1_0_7.addButton("Englewood", "goCommunities(68)")
 
-#cc = menu1_0_8.getContainer()
-#btn_70 = Button.create(cc)
-#btn_71 = Button.create(cc)
-#btn_72 = Button.create(cc)
-#btn_73 = Button.create(cc)
-#btn_74 = Button.create(cc)
-#btn_75 = Button.create(cc)
 btn_70 = menu1_0_8.addButton("Ashburn", "goCommunities(70)")
 btn_71 = menu1_0_8.addButton("Auburn Gresham", "goCommunities(71)")
 btn_72 = menu1_0_8.addButton("Beverly", "goCommunities(72)")
@@ -341,19 +226,6 @@ btn_73 = menu1_0_8.addButton("Washington Heights", "goCommunities(73)")
 btn_74 = menu1_0_8.addButton("Mount Greenwood", "goCommunities(74)")
 btn_75 = menu1_0_8.addButton("Morgan Park", "goCommunities(75)")
 
-#cc = menu1_0_9.getContainer()
-#btn_44 = Button.create(cc)
-#btn_45 = Button.create(cc)
-#btn_46 = Button.create(cc)
-#btn_47 = Button.create(cc)
-#btn_48 = Button.create(cc)
-#btn_49 = Button.create(cc)
-#btn_50 = Button.create(cc)
-#btn_51 = Button.create(cc)
-#btn_52 = Button.create(cc)
-#btn_53 = Button.create(cc)
-#btn_54 = Button.create(cc)
-#btn_55 = Button.create(cc)
 btn_44 = menu1_0_9.addButton("Chatham", "goCommunities(44)")
 btn_45 = menu1_0_9.addButton("Avalon Park", "goCommunities(45)")
 btn_46 = menu1_0_9.addButton("South Chicago", "goCommunities(46)")
@@ -411,18 +283,20 @@ menu1_2simu = menu0_chicago.addSubMenu("REAL TIME WATCH")
 cc = menu1_2simu.getContainer()
 label_simu = Label.create(cc)
 label_simu.setText("TEST SIMULATION")
+# TO DO simulation
 
+# paths for crime sprites
+spritePath = [None]*11
+for i in range(1,11):
+	spritePath[i] = "icon/"+str(i)+".png"
+
+# INITIALIZE THE SCENE
 scene = getSceneManager()
-
-# deal with audio                                                                         
-env = getSoundEnvironment()
-
-# set the background to black
 scene.setBackgroundColor(Color(0, 0, 0, 1))
-
+env = getSoundEnvironment()
 all = SceneNode.create("everything")
 
-# Create a directional light
+# create a directional light
 light1 = Light.create()
 light1.setLightType(LightType.Directional)
 light1.setLightDirection(Vector3(-1.0, -1.0, -1.0))
@@ -430,95 +304,91 @@ light1.setColor(Color(0.7, 0.7, 0.7, 1.0))
 light1.setAmbient(Color(0.5, 0.5, 0.5, 1.0))
 light1.setEnabled(True)
 
-# Load a static model
-torusModel = ModelInfo()
-torusModel.name = "earth"
-
+# load some earth models
+torusModel1 = ModelInfo()
 torusModel2 = ModelInfo()
-torusModel2.name = "map"
-
 torusModel3 = ModelInfo()
-torusModel3.name = 'yahoo_aerial'
-
 torusModel4 = ModelInfo()
-torusModel4.name = 'yahoo_maps'
 
-if caveutil.isCAVE() == False:
-	torusModel2.path = "simple.earth"
-	#laptop: it works!
-	#cave:
+torusModel1.name = "earth"
+torusModel2.name = "map"
+torusModel3.name = 'yahoo_earth'
+torusModel4.name = 'yahoo_map'
 
-	torusModel.path = "simple.earth"
-	#laptop:it works!
-	#cave: failed to load jpeg and tiff
-
-#torusModel.path = "vertical_datum.earth"
-#laptop:
-#cave: failed
-
-#torusModel.path = "feature_geom.earth"
-#laptop:
-#cave: failed
-
-else:
+if caveutil.isCAVE():
 	torusModel2.path = "openstreetmap.earth"
 	#torusModel2.path = "simple.earth"
 	#laptop: crash when start
 	#cave: it works!
 
-	torusModel.path = "mapquestaerial.earth"
+	torusModel1.path = "mapquestaerial.earth"
 	#torusModel.path = "simple.earth"
 	#laptop: crash when start
 	#cave: it works!
 
-#torusModel2.path = "yahoo_maps.earth"
-#laptop: crash during running / it works (without showing anything)
-#cave: works (too low no data)
+	torusModel3.path = "yahoo_aerial.earth"
+	#laptop: it works (without showing anything)
+	#cave: works (too low no data)
+	
+	torusModel4.path = "yahoo_maps.earth"
+	#laptop: crash during running / it works (without showing anything)
+	#cave: works (too low no data)
 
-#torusModel.path = "yahoo_aerial.earth"
-#laptop: it works (without showing anything)
-#cave: works (too low no data)
+else:
+	torusModel1.path = "simple.earth"
+	torusModel2.path = "simple.earth"
 
-#scene.loadModel(torusModel)
-#scene.loadModel(torusModel2)
+scene.loadModel(torusModel1)
+scene.loadModel(torusModel2)
+scene.loadModel(torusModel3)
+scene.loadModel(torusModel4)
 
-# Create a scene object using the loaded model
+# create scene objects using the loaded models
 torus1 = StaticObject.create("earth")
 torus1.getMaterial().setLit(False)
-#all.addChild(torus1)
+all.addChild(torus1)
 
 torus2 = StaticObject.create("map")
 torus2.getMaterial().setLit(False)
 all.addChild(torus2)
 torus2.setVisible(False)
 
-#crime models
+torus3 = StaticObject.create("yahoo_earth")
+torus3.getMaterial().setLit(False)
+all.addChild(torus3)
+torus2.setVisible(False)
+
+torus4 = StaticObject.create("yahoo_map")
+torus4.getMaterial().setLit(False)
+all.addChild(torus3)
+torus2.setVisible(False)
+
+# create crime models
 spriteSize = sprite.createSizeUniform()
 #spriteSize.setFloat(0.1)
 spriteWindowSize = sprite.createWindowSizeUniform()
 spriteWindowSize.setVector2f(Vector2(854, 480))
 
+cam = getDefaultCamera()
 setNearFarZ(1, 20 * r_a)
 
-cam = getDefaultCamera()
-
-# Setting the camera by hand
+# set the camera by hand
 cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
 cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 
 # set a fast speed for travel by default
 cam.getController().setSpeed(10000)
 
+# set interpolation animation
 interp = InterpolActor(cam)
 interp.setTransitionType(InterpolActor.SMOOTH)
 interp.setDuration(3)
 interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
 
 # CTA stops
-f = open('CHICAGO_DATA/cta_L_stops/cta_L_stops_final.csv')
+f = open('CHICAGO_DATA/cta_L_stops/cta_L_stops_final.csv', 'rb')
 ctastops = csv.reader(f)
 for stop in ctastops:
-	
 	model = SphereShape.create(50, 3)
 
 	pos = llh2ecef(float(stop[1]), float(stop[0]), 0.0)
@@ -536,7 +406,6 @@ for stop in ctastops:
 
 	all.addChild(model)
 	all.addChild(text)
-
 f.close()
 
 # CTA lines
@@ -601,14 +470,14 @@ def getTrainInfo():
 			model.setEffect('colored -d white')
 			nodeTrainParent.addChild(model)
 
-# SIN CITY
+# VICE CITY
 #sincity="""
 
 nodeComm = [None]*78
 nodeYear = [None]*14
 nodeCrime = [None]*11
 
-nodeSinCityParent = SceneNode.create('SIN CITY')
+nodeSinCityParent = SceneNode.create('VICE CITY')
 all.addChild(nodeSinCityParent)
 
 for i in range(0,78):
@@ -627,58 +496,48 @@ for i in range(0,78):
 			nodeYear[j].addChild(nodeCrime[k])
 
 count = 0
-f = open('Crimes2013_final.csv', 'rb')
-
+f = open('CrimesAll_final.csv', 'rb')
 lines = csv.reader(f)
 atLine = 0
 for items in lines:
 	atLine+=1
 	crime_type = items[2]
 	crime_comm = int(items[4])
-	#crime_year = int(items[5])
-	#crime_lat = float(items[6])
-	#crime_lon = float(items[7])
-
-	crime_year = 2013
-	crime_lat = float(items[5])
-	crime_lon = float(items[6])
+	crime_year = int(items[5])
+	crime_lat = float(items[6])
+	crime_lon = float(items[7])
+	#crime_year = 2013
+	#crime_lat = float(items[5])
+	#crime_lon = float(items[6])
 	
 	pos = llh2ecef(crime_lat, crime_lon, 100.0)
 
-	spritePath = "icon/"+str(crimeType[crime_type])+".png"
-	crimeIcon = sprite.createSprite(spritePath, spriteSize, spriteWindowSize, True)
+	crimeIcon = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
 	crimeIcon.setPosition(pos)
 	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(crimeIcon)
 	comm[crime_comm].numCrime[crime_year-2000][crimeType[crime_type]]+=1
-
-	#model = StaticObject.create(25,3)
-	#model.setPosition(pos)
-	#model.lookAt(Vector3(0,0,0), Vector3(pos[0],pos[1],pos[2]))
-	#model.setEffect('colored -d red')
-	#nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(model)
-
-	if (atLine>100):
+	if crime_year==2013:
+		comm[crime_comm].numCrimeShown+=1
+	if (atLine>200):
 		break
-
 f.close()
+
+labelComm = [None]*78
 
 # COMMUNITY LABELS
 for i in range(1,78):
-	labelComm = Text3D.create('font/Franchise-Bold-hinted.ttf', 40, comm[i].name+' ('+str(comm[i].numCrime[13][1])+')') # TO DO : change the value
-	caveutil.orientWithHead(cam, labelComm)
+	labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 40, comm[i].name+' ('+str(comm[i].numCrimeShown)+')') # TO DO : change the value
+	caveutil.orientWithHead(cam, labelComm[i])
 
 	posComm = llh2ecef(comm[i].lat, comm[i].lon, 300.0)
-	labelComm.setPosition(posComm)
-	labelComm.setFixedSize(True)
-	labelComm.setColor(Color('#cccccc')) # Silver
-	all.addChild(labelComm)
+	labelComm[i].setPosition(posComm)
+	labelComm[i].setFixedSize(True)
+	labelComm[i].setColor(Color('#cccccc')) # Silver
+	all.addChild(labelComm[i])
 
-# since the scale here is pretty large stereo doesnt help much
-# so lets start with it turned off
 toggleStereo()
 
 #put the camera to Chicago
-
 # it would be better to set the speed based on the height over the surface
 # to move slower as you get closer
 
@@ -686,7 +545,8 @@ toggleStereo()
 testObject = PlaneShape.create(20, 20)
 testObject.setEffect("colored -d red")
 all.addChild(testObject)
-caveutil.positionAtHead (cam, testObject, 2)
+caveutil.positionAtHead(cam, testObject, 2)
+caveutil.orientWithHead(cam, testObject)
 
 d0 = 0
 d1 = 0
@@ -731,8 +591,6 @@ legend.setLayer(WidgetLayer.Front)
 #legend.setSize(Vector2(200,200))
 legend.setPosition(Vector2(854,480)-legend.getSize())
 
-#modelGeom = ModelGeometry.create('model')
-
 def onEvent():
 	global userScaleFactor
 
@@ -763,7 +621,7 @@ def onEvent():
 		wandOri = e.getOrientation()
 		cam.setOrientation( cam.getOrientation() + (wandOri-wandOldOrientation)*0.01 )
 
-burning = """
+navi = """
 	elif e.isKeyDown(ord('j')):
 		cam.setPosition( cam.convertLocalToWorldPosition(cam.getPosition() + Vector3(-1,0,0)*100 )
 	elif e.isKeyDown(ord('l')):
@@ -783,7 +641,6 @@ burning = """
 """
 
 trainDeltaT = 0
-
 def onUpdate(frame, t, dt):
 	global trainDeltaT
 
@@ -797,9 +654,9 @@ def onUpdate(frame, t, dt):
 	cam.getController().setSpeed(r)
 
 	if (t-trainDeltaT>=10):
-		print "not updating CTA trains"
+		print "updating CTA trains"
 		trainDeltaT = t
-		#getTrainInfo()
+		getTrainInfo()
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
@@ -816,13 +673,135 @@ def goCommunities(x):
 	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 	interp.startInterpolation()
 	playMovingSound()
-
-	#cam.setPosition(newPos)
-	#commPos = llh2ecef(comm[x].lat, comm[x].lon, 0.0)
-	#cam.lookAt(commPos, newPos)
-	#cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-
 	# TO DO show data of this community
+
+# HOW TO FILTER CRIME TYPES AND YEARS
+
+notCrime = set()
+notYear = set()
+notCom = set()
+
+## CLICK CRIME TYPE FILTER BUTTONS
+def clickCrime(crime):
+	if crime==0:
+		if btnCrime[0].isChecked(): # if we want to show all
+			notCrime.clear()
+			for j in range(1,11):
+				if btnCrime[j].isChecked()==False:
+					notCrime.add(j) # collect all crimes currently not checked
+					btnCrime[j].setChecked(True)
+					clickCrime(j)
+		else: # if we want to quit show all
+			for j in notCrime:
+				btnCrime[j].setChecked(False)
+				clickCrime(j)
+	else: # individual crime type
+		if btnCrime[crime].isChecked(): # if we want to check this crime
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					if nodeComm[com].isVisible() and n.isVisible():
+						n.getChildByIndex(crime).setVisible(True)
+						n.getChildByIndex(crime).setChildrenVisible(True)
+						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						n.getChildByIndex(crime).setVisible(True)
+		else: # if we want to uncheck this crime
+			if btnCrime[0].isChecked(): # nothing happens
+				btnCrime[crime].setChecked(True)
+				return 0
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					if nodeComm[com].isVisible() and n.isVisible():
+						n.getChildByIndex(crime).setVisible(False)
+						n.getChildByIndex(crime).setChildrenVisible(False)
+						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						n.getChildByIndex(crime).setVisible(False)
+
+## CLICK YEAR FILTER BUTTONS
+def clickYear(year):
+	if year==0:
+		if btnYear[0].isChecked(): # if we want to show all
+			notYear.clear()
+			for j in range(1,14):
+				if btnYear[j].isChecked()==False:
+					notYear.add(j) # collect all years currently not checked
+					btnYear[j].setChecked(True)
+					clickYear(j)
+		else: # if we want to quit show all
+			for j in notYear:
+				btnCrime[j].setChecked(False)
+				clickYear(j)
+	else: # individual year
+		if btnYear[year].isChecked(): # if we want to check this year
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
+					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
+						nodeComm[com].setVisible(True)
+						n.setChildrenVisible(True)
+						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						nodeComm[com].setVisible(True)
+		else: # if we want to uncheck this year
+			if btnYear[0].isChecked(): # nothing happens
+				btnCrime[year].setChecked(True)
+				return 0
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
+					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
+						nodeComm[com].setVisible(False)
+						n.setChildrenVisible(False)
+						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						nodeComm[com].setVisible(False)
+
+nodeTrainParent = SceneNode.create("allTrain")
+all.addChild(nodeTrainParent)
+
+never ="""
+												!!!KIDNAPPING : 165 (ICON USING OTHERS)
+		INTERFERE WITH PUBLIC OFFICER : 0
+		PUBLIC PEACE VIOLATION : 2077
+		INTERFERENCE WITH PUBLIC OFFICER : 845
+	???PROSTITUTION : 1115 (ICON)
+		LIQUOR LAW VIOLATION : 314
+		RITUALISM : 0
+															!!!ROBBERY : 7314 (7379) (ICON GET)
+															BURGLARY (FORCIBLE ENTRY): 10915 (7272) (ICON GET)
+!!!WEAPONS VIOLATION : 2125 (ICON)
+		OTHER NARCOTIC VIOLATION : 2
+												!!!HOMICIDE : 269 (273) (ICON GET)
+		OBSCENITY : 16
+		OFFENSES INVOLVING CHILDREN : 0
+		OTHER OFFENSE : 11619
+																???CRIMINAL DAMAGE (TO CITY OF CHICAGO PROPERTY, *VANDALISM): 19193 (434) (ICON GET)
+															!!!MOTOR VEHICLE THEFT : 8276 (ICON GET)
+															???THEFT (over $500): 42018 (8944) (ICON GET)
+		OFFENSE INVOLVING CHILDREN : 1453
+		GAMBLING : 430
+		PUBLIC INDECENCY : 6
+		NON-CRIMINAL (SUBJECT SPECIFIED) : 0
+												!!!ARSON : 261 (ICON GET)
+		INTIMIDATION : 93
+		SEX OFFENSE : 616
+		NARCOTICS : 22027
+		DECEPTIVE PRACTICE : 7351
+		BATTERY : 35456
+		CRIMINAL TRESPASS : 5208
+		STALKING : 81
+																ASSAULT (AGGRAVATED*): 11297 (2479) (ICON GET)
+												CRIM SEXUAL ASSAULT (AGGRAVATED*): 761 (190) (ICON GET)
+		NON-CRIMINAL : 3
+		DOMESTIC VIOLENCE : 0
+"""
 
 conditionstat="""
 	if x<39: # 1 - 38
@@ -1043,215 +1022,44 @@ conditionstat="""
 							print btn_77.getText();
 """
 
-# HOW TO FILTER CRIME TYPES AND YEARS
-
-notCrime = set()
-notYear = set()
-notCom = set()
-
-## CLICK CRIME TYPE FILTER BUTTONS
-def clickCrime(crime):
-	if crime==0:
-		if btnCrime[0].isChecked(): # if we want to show all
-			notCrime.clear()
-			for j in range(1,11):
-				if btnCrime[j].isChecked()==False:
-					notCrime.add(j) # collect all crimes currently not checked
-					btnCrime[j].setChecked(True)
-					clickCrime(j)
-		else: # if we want to quit show all
-			for j in notCrime:
-				btnCrime[j].setChecked(False)
-				clickCrime(j)
-	else: # individual crime type
-		if btnCrime[crime].isChecked(): # if we want to check this crime
-			for com in range(1,78):
-				for year in range(1,14):
-					n = nodeComm[com].getChildByIndex(year)
-					if nodeComm[com].isVisible() and n.isVisible():
-						n.getChildByIndex(crime).setVisible(True)
-						n.getChildByIndex(crime).setChildrenVisible(True)
-					else:
-						n.getChildByIndex(crime).setVisible(True)
-		else: # if we want to uncheck this crime
-			if btnCrime[0].isChecked(): # nothing happens
-				btnCrime[crime].setChecked(True)
-				return 0
-			for com in range(1,78):
-				for year in range(1,14):
-					n = nodeComm[com].getChildByIndex(year)
-					if nodeComm[com].isVisible() and n.isVisible():
-						n.getChildByIndex(crime).setVisible(False)
-						n.getChildByIndex(crime).setChildrenVisible(False)
-					else:
-						n.getChildByIndex(crime).setVisible(False)
-
-## CLICK YEAR FILTER BUTTONS
-def clickYear(year):
-	if year==0:
-		if btnYear[0].isChecked(): # if we want to show all
-			notYear.clear()
-			for j in range(1,14):
-				if btnYear[j].isChecked()==False:
-					notYear.add(j) # collect all years currently not checked
-					btnYear[j].setChecked(True)
-					clickYear(j)
-		else: # if we want to quit show all
-			for j in notYear:
-				btnCrime[j].setChecked(False)
-				clickYear(j)
-	else: # individual year
-		if btnYear[year].isChecked(): # if we want to check this year
-			for com in range(1,78):
-				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
-					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
-						nodeComm[com].setVisible(True)
-						n.setChildrenVisible(True)
-					else:
-						nodeComm[com].setVisible(True)
-		else: # if we want to uncheck this year
-			if btnYear[0].isChecked(): # nothing happens
-				btnCrime[year].setChecked(True)
-				return 0
-			for com in range(1,78):
-				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
-					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
-						nodeComm[com].setVisible(False)
-						n.setChildrenVisible(False)
-					else:
-						nodeComm[com].setVisible(False)
-
-nodeTrainParent = SceneNode.create("allTrain")
-all.addChild(nodeTrainParent)
-
-never ="""
-												!!!KIDNAPPING : 165 (ICON USING OTHERS)
-		INTERFERE WITH PUBLIC OFFICER : 0
-		PUBLIC PEACE VIOLATION : 2077
-		INTERFERENCE WITH PUBLIC OFFICER : 845
-	???PROSTITUTION : 1115 (ICON)
-		LIQUOR LAW VIOLATION : 314
-		RITUALISM : 0
-															!!!ROBBERY : 7314 (7379) (ICON GET)
-															BURGLARY (FORCIBLE ENTRY): 10915 (7272) (ICON GET)
-!!!WEAPONS VIOLATION : 2125 (ICON)
-		OTHER NARCOTIC VIOLATION : 2
-												!!!HOMICIDE : 269 (273) (ICON GET)
-		OBSCENITY : 16
-		OFFENSES INVOLVING CHILDREN : 0
-		OTHER OFFENSE : 11619
-																???CRIMINAL DAMAGE (TO CITY OF CHICAGO PROPERTY, *VANDALISM): 19193 (434) (ICON GET)
-															!!!MOTOR VEHICLE THEFT : 8276 (ICON GET)
-															???THEFT (over $500): 42018 (8944) (ICON GET)
-		OFFENSE INVOLVING CHILDREN : 1453
-		GAMBLING : 430
-		PUBLIC INDECENCY : 6
-		NON-CRIMINAL (SUBJECT SPECIFIED) : 0
-												!!!ARSON : 261 (ICON GET)
-		INTIMIDATION : 93
-		SEX OFFENSE : 616
-		NARCOTICS : 22027
-		DECEPTIVE PRACTICE : 7351
-		BATTERY : 35456
-		CRIMINAL TRESPASS : 5208
-		STALKING : 81
-																ASSAULT (AGGRAVATED*): 11297 (2479) (ICON GET)
-												CRIM SEXUAL ASSAULT (AGGRAVATED*): 761 (190) (ICON GET)
-		NON-CRIMINAL : 3
-		DOMESTIC VIOLENCE : 0
-"""
-
-areas="""
-Far North Side
-	01 	Rogers Park
-	02 	West Ridge
-	03 	Uptown
-	04 	Lincoln Square
-	09	Edison Park
-	10	Norwood Park
-	11	Jefferson Park
-	12	Forest Glen
-	13	North Park
-	14	Albany Park
-	76	"O'Hare"
-	77	Edgewater
-Northwest Side
-	15	Portage Park
-	16	Irving Park
-	17	Dunning
-	18	Montclare
-	19	Belmont Cragin
-	20	Hermosa
-North Side
-	5 	North Center
-	6 	Lake View
-	7	Lincoln Park
-	21	Avondale
-	22	Logan Square
-West Side
-	23	Humboldt Park
-	24	West Town
-	25	Austin
-	26	West Garfield Park
-	27	East Garfield Park
-	28	Near West Side
-	29	North Lawndale
-	30	South Lawndale
-	31	Lower West Side
-Central
-	8 	Near North Side
-	32	Loop
-	33	Near South Side
-South Side
-	34	Armour Square
-	35	Douglas
-	36	Oakland
-	37	Fuller Park
-	38	Grand Boulevard
-	39	Kenwood
-	40	Washington Park
-	41	Hyde Park
-	42	Woodlawn
-	43	South Shore
-	60	Bridgeport
-	69	Greater Grand Crossing
-Southwest Side
-	56	Garfield Ridge	
-	57	Archer Heights	
-	58	Brighton Park
-	59	McKinley Park
-	61	New City
-	62	West Elsdon
-	63	Gage Park
-	64	Clearing
-	65	West Lawn
-	66	Chicago Lawn
-	67	West Englewood
-	68	Englewood
-Far Southwest Side
-	70	Ashburn
-	71	Auburn Gresham
-	72	Beverly
-	73	Washington Heights
-	74	Mount Greenwood
-	75	Morgan Park
-Far Southeast Side
-	44	Chatham
-	45	Avalon Park
-	46	South Chicago
-	47	Burnside
-	48	Calumet Heights
-	49	Roseland
-	50	Pullman
-	51	South Deering
-	52	East Side
-	53	West Pullman
-	54	Riverdale
-	55	Hegewisch
-"""
-
-
-	
-
+TYPE = set
+(
+	["KIDNAPPING",
+	"PUBLIC INDECENCY",
+	"PUBLIC PEACE VIOLATION",
+	"INTERFERENCE WITH PUBLIC OFFICER",
+	"PROSTITUTION",
+	"LIQUOR LAW VIOLATION",
+	"ROBBERY",
+	"BURGLARY",
+	"WEAPONS VIOLATION",
+	"HOMICIDE",
+	"OBSCENITY",
+	"OTHER OFFENSE",
+	"CRIMINAL DAMAGE",
+	"THEFT",
+	"OFFENSE INVOLVING CHILDREN",
+	"GAMBLING",
+	"OTHER NARCOTIC VIOLATION",
+	"ARSON",
+	"OTHER OFFENSE",
+	"NARCOTICS",
+	"SEX OFFENSE",
+	"STALKING",
+	"INTIMIDATION",
+	"DECEPTIVE PRACTICE",
+	"BATTERY",
+	"CRIMINAL TRESPASS",
+	"MOTOR VEHICLE THEFT",
+	"ASSAULT",
+	"CRIM SEXUAL ASSAULT",
+	"NON-CRIMINAL",
+	"INTERFERE WITH PUBLIC OFFICER",
+	"RITUALISM",
+	"OTHER NARCOTIC VIOLATION",
+	"HOMICIDE",
+	"OBSCENITY",
+	"OFFENSES INVOLVING CHILDREN",
+	"NON-CRIMINAL (SUBJECT SPECIFIED)",
+	"DOMESTIC VIOLENCE"]
+)
