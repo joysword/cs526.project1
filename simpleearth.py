@@ -449,6 +449,9 @@ for seg in ctaLines:
 f.close()
 
 # GET TRAIN LOCATION FROM CTA
+nodeTrainParent = SceneNode.create("allTrain")
+all.addChild(nodeTrainParent)
+
 def getTrainInfo():
 	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
 	root = ET.fromstring(train_xml)
@@ -462,11 +465,18 @@ def getTrainInfo():
 			lat = float(train.find('lat').text)
 			lon = float(train.find('lon').text)
 			heading = float(train.find('heading').text)
-			pos = llh2ecef(lat, lon, 100.0)
-			model = BoxShape.create(100,20,200)
+			
+			pos = llh2ecef(lat, lon, 70)
+			model = BoxShape.create(50,40,300)
 			#model.setBoundingBoxVisible(True)
 			model.setPosition(pos[0],pos[1],pos[2])
-			#model.lookAt(model.convertWorldToLocalPosition(Vector3(0,0,0)), model.convertWorldToLocalPosition(Vector3(pos[0],pos[1],pos[2])))
+			lookHeading = heading-90 # east is 0, south is 90, west is 180, north is 270
+			if lookHeading<0:
+				lookHeading+=360
+			lookLat = lat - math.sin(lookHeading*math.pi/180.0)/1109.4
+			lookLon = lon + math.cos(lookHeading*math.pi/180.0)/852.7
+			model.lookAt(llh2ecef(lookLat, lookLon, 110), model.convertWorldToLocalPosition(1.1*Vector3(pos[0],pos[1],pos[2])))
+			#model.yaw()
 			model.setEffect('colored -d white')
 			nodeTrainParent.addChild(model)
 
@@ -542,11 +552,11 @@ toggleStereo()
 # to move slower as you get closer
 
 # TEST FACE CAMERA
-testObject = PlaneShape.create(20, 20)
-testObject.setEffect("colored -d red")
-all.addChild(testObject)
-caveutil.positionAtHead(cam, testObject, 2)
-caveutil.orientWithHead(cam, testObject)
+#testObject = PlaneShape.create(20, 20)
+#testObject.setEffect("colored -d red")
+#all.addChild(testObject)
+#caveutil.positionAtHead(cam, testObject, 2)
+#caveutil.orientWithHead(cam, testObject)
 
 d0 = 0
 d1 = 0
@@ -641,6 +651,7 @@ navi = """
 """
 
 trainDeltaT = 0
+getTrainInfo()
 def onUpdate(frame, t, dt):
 	global trainDeltaT
 
@@ -763,8 +774,6 @@ def clickYear(year):
 					else:
 						nodeComm[com].setVisible(False)
 
-nodeTrainParent = SceneNode.create("allTrain")
-all.addChild(nodeTrainParent)
 
 never ="""
 												!!!KIDNAPPING : 165 (ICON USING OTHERS)
