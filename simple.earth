@@ -3,99 +3,30 @@
         <url>world.tif</url>
     </image>
 
-    <model name="CTALines" driver="feature_geom" enabled="true" visible="true">
-        <features name="CTALines" driver="ogr" build_spatial_index="true">
-            <url>CHICAGO_DATA/CTA_RailLines/CTA_RailLines2.shp</url>
-        </features>
-        
-        <!--
-        <fading max_range="3500"/>
-        -->
-
-        <!--
-        <layout crop_features="true" tile_size_factor="15">
-            <level max_range="100000000"/>
-        </layout>
-        -->  
-
-        <styles>
-            <style type="text/css">
-                blue {
-                    stroke:                       #0000ff;
-                    stroke-width:                 3;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-            <style type="text/css">
-                red {
-                    stroke:                       #ff0000;
-                    stroke-width:                 3;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-            <style type="text/css">
-                green {
-                    stroke:                       #00ff00;
-                    stroke-width:                 3;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-            <style type="text/css">
-                yellow {
-                    stroke:                       #ffff00;
-                    stroke-width:                 3;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-            <style type="text/css">
-                white {
-                    stroke:                       #000000;
-                    stroke-width:                 3;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-
-            <!--script language="javascript">
-            <![CDATA[
-                function getStyleClass()
-                {
-                    var pop = feature.attributes['pop_cntry'];
-                    if      ( pop == "BL" )  return "blue";
-                    else if ( pop == "RD" )  return "red";
-                    else if ( pop == "GR" )  return "green";
-                    else                     return "yellow";
-                }
-            ]]>
-            </script>
-            
-            <selector class_expr="getStyleClass()"/-->
-
-        </styles>        
-    </model>
-
-    <model name="CTAStations" driver="feature_geom" enabled="true" visible="true">
-        <features name="CTAStations" driver="ogr" build_spatial_index="true">
-            <url>CHICAGO_DATA/CTA_RailStations/CTA_RailStations.shp</url>
+    <model name="community" driver="feature_geom" enabled="true" visible="true">
+        <features name="community" driver="ogr" build_spatial_index="true">
+            <url>CHICAGO_DATA/commareas/CommAreas.shp</url>
         </features>
 
         <styles>
             <style type="text/css">
                 red {
-                    point-size:                   3;
+                    point-size:                   50;
                     fill:                         #ff0000;
                     altitude-clamping:            terrain;
                     altitude-technique:           gpu;
                 }
             </style>
         </styles>
+        
+        <!--
+        <fading max_range="3500"/>
+        -->
 
+        <layout crop_features="true" tile_size_factor="15">
+            <level max_range="100000000"/>
+        </layout>
     </model>
-
 </map>
 
 

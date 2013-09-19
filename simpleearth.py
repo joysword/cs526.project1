@@ -42,6 +42,113 @@ def llh2ecef(lat, lon, alt):
 
 crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'CRIMINAL DAMAGE':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
 
+## HOW TO GO TO A COMMUNITY
+def goCommunities(x):
+	print "going to %s at (%f,%f)" %(comm[x].name, comm[x].lat, comm[x].lon)
+	newLat = comm[x].lat-5/110.94 # 1 lat is 110940 meters, we want 3km south to the particular point
+	newLon = comm[x].lon
+	newPos = llh2ecef(newLat, newLon, 3000) # 5000 meters high
+
+	interp.setTargetPosition(newPos)
+	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+	interp.startInterpolation()
+	playMovingSound()
+	# TO DO show data of this community
+
+# HOW TO FILTER CRIME TYPES AND YEARS
+
+notCrime = set()
+notYear = set()
+notCom = set()
+
+## CLICK CRIME TYPE FILTER BUTTONS
+def clickCrime(crime):
+	if crime==0:
+		if btnCrime[0].isChecked(): # if we want to show all
+			notCrime.clear()
+			for j in range(1,11):
+				if btnCrime[j].isChecked()==False:
+					notCrime.add(j) # collect all crimes currently not checked
+					btnCrime[j].setChecked(True)
+					clickCrime(j)
+		else: # if we want to quit show all
+			for j in notCrime:
+				btnCrime[j].setChecked(False)
+				clickCrime(j)
+	else: # individual crime type
+		if btnCrime[crime].isChecked(): # if we want to check this crime
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					if nodeComm[com].isVisible() and n.isVisible():
+						n.getChildByIndex(crime).setVisible(True)
+						n.getChildByIndex(crime).setChildrenVisible(True)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
+						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
+					else:
+						n.getChildByIndex(crime).setVisible(True)
+		else: # if we want to uncheck this crime
+			if btnCrime[0].isChecked(): # nothing happens
+				btnCrime[crime].setChecked(True)
+				return 0
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					if nodeComm[com].isVisible() and n.isVisible():
+						n.getChildByIndex(crime).setVisible(False)
+						n.getChildByIndex(crime).setChildrenVisible(False)
+						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						n.getChildByIndex(crime).setVisible(False)
+
+## CLICK YEAR FILTER BUTTONS
+def clickYear(year):
+	if year==0:
+		if btnYear[0].isChecked(): # if we want to show all
+			notYear.clear()
+			for j in range(1,14):
+				if btnYear[j].isChecked()==False:
+					notYear.add(j) # collect all years currently not checked
+					btnYear[j].setChecked(True)
+					clickYear(j)
+		else: # if we want to quit show all
+			for j in notYear:
+				btnCrime[j].setChecked(False)
+				clickYear(j)
+	else: # individual year
+		if btnYear[year].isChecked(): # if we want to check this year
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
+					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
+						nodeComm[com].setVisible(True)
+						n.setChildrenVisible(True)
+						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						nodeComm[com].setVisible(True)
+		else: # if we want to uncheck this year
+			if btnYear[0].isChecked(): # nothing happens
+				btnCrime[year].setChecked(True)
+				return 0
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
+					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
+						nodeComm[com].setVisible(False)
+						n.setChildrenVisible(False)
+						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						nodeComm[com].setVisible(False)
+
+
+
 class community:
 	name = ''
 	lat = 0
@@ -54,6 +161,7 @@ class community:
 		self.lat = x
 		self.lon = y
 		self.pos = llh2ecef(x,y,0)
+		self.numCrimeShown = 0
 	def watchme(self):
 		print ("watching community %s" %(self.name))
 
@@ -356,18 +464,22 @@ torus2.setVisible(False)
 torus3 = StaticObject.create("yahoo_earth")
 torus3.getMaterial().setLit(False)
 all.addChild(torus3)
-torus2.setVisible(False)
+torus3.setVisible(False)
 
 torus4 = StaticObject.create("yahoo_map")
 torus4.getMaterial().setLit(False)
 all.addChild(torus3)
-torus2.setVisible(False)
+torus4.setVisible(False)
 
 # create crime models
 spriteSize = sprite.createSizeUniform()
 #spriteSize.setFloat(0.1)
 spriteWindowSize = sprite.createWindowSizeUniform()
-spriteWindowSize.setVector2f(Vector2(854, 480))
+spriteWindowSize = None
+#if caveutil.isCAVE:
+#	spriteWindowSize.setVector2f(Vector2(10000, 1000))
+#else:
+#	spriteWindowSize.setVector2f(Vector2(854, 480))
 
 cam = getDefaultCamera()
 setNearFarZ(1, 20 * r_a)
@@ -395,14 +507,16 @@ for stop in ctastops:
 	model.setPosition(pos)
 	model.setEffect('colored -d white')
 
-	text = Text3D.create('font/helvetica.ttf', 15, stop[2])
+	text = Text3D.create('font/helvetica.ttf', 100, stop[2])
+	if caveutil.isCAVE==False:
+		text = Text3D.create('font/helvetica.ttf', 10, stop[2])
 	caveutil.orientWithHead(cam, text)
-	text.roll(math.pi/4)
+	text.roll(math.pi/4*0.75)
 
 	posText = llh2ecef(float(stop[1]), float(stop[0]), 100.0)
 	text.setPosition(posText)
 	text.setFixedSize(True)
-	text.setColor(Color('#8080FF'))
+	text.setColor(Color('black'))
 
 	all.addChild(model)
 	all.addChild(text)
@@ -453,6 +567,7 @@ nodeTrainParent = SceneNode.create("allTrain")
 all.addChild(nodeTrainParent)
 
 def getTrainInfo():
+	print ("updating...")
 	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
 	root = ET.fromstring(train_xml)
 
@@ -470,7 +585,7 @@ def getTrainInfo():
 			model = BoxShape.create(50,40,300)
 			#model.setBoundingBoxVisible(True)
 			model.setPosition(pos[0],pos[1],pos[2])
-			lookHeading = heading-90 # east is 0, south is 90, west is 180, north is 270
+			lookHeading = heading-90 # let east is 0, south is 90, west is 180, north is 270
 			if lookHeading<0:
 				lookHeading+=360
 			lookLat = lat - math.sin(lookHeading*math.pi/180.0)/1109.4
@@ -479,6 +594,7 @@ def getTrainInfo():
 			#model.yaw()
 			model.setEffect('colored -d white')
 			nodeTrainParent.addChild(model)
+	print ("updated!")
 
 # VICE CITY
 #sincity="""
@@ -524,25 +640,32 @@ for items in lines:
 
 	crimeIcon = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
 	crimeIcon.setPosition(pos)
+	crimeIcon.getMaterial().setLit(False)
 	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(crimeIcon)
 	comm[crime_comm].numCrime[crime_year-2000][crimeType[crime_type]]+=1
 	if crime_year==2013:
 		comm[crime_comm].numCrimeShown+=1
-	if (atLine>200):
+	if (atLine>1000):
 		break
 f.close()
+
+for k in range(1,11):
+	print "loop's # of crime in 2013 [%d] = %d" %(k,comm[32].numCrime[13][k])
 
 labelComm = [None]*78
 
 # COMMUNITY LABELS
 for i in range(1,78):
-	labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 40, comm[i].name+' ('+str(comm[i].numCrimeShown)+')') # TO DO : change the value
-	caveutil.orientWithHead(cam, labelComm[i])
+	if caveutil.isCAVE:
+		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 200, comm[i].name+' ('+str(comm[i].numCrimeShown)+')')
+	else:
+		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 10, comm[i].name+' ('+str(comm[i].numCrimeShown)+')') # TO DO : change the value
 
 	posComm = llh2ecef(comm[i].lat, comm[i].lon, 300.0)
 	labelComm[i].setPosition(posComm)
 	labelComm[i].setFixedSize(True)
 	labelComm[i].setColor(Color('#cccccc')) # Silver
+	caveutil.orientWithHead(cam, labelComm[i])
 	all.addChild(labelComm[i])
 
 toggleStereo()
@@ -558,9 +681,6 @@ toggleStereo()
 #caveutil.positionAtHead(cam, testObject, 2)
 #caveutil.orientWithHead(cam, testObject)
 
-d0 = 0
-d1 = 0
-d2 = 0
 r = 0
 r2 = 0
 
@@ -572,22 +692,32 @@ wandOldPos = Vector3()
 wandOldOri = Quaternion()
 
 def playBtnDownSound(e):
-	sd = SoundInstance(env.loadSoundFromFile("/sound/menu/down.wav"))
+	print ('button down')
+	sd = SoundInstance(env.loadSoundFromFile("sound/menu/down.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
 def playBtnUpSound(e):
-	sd = SoundInstance(env.loadSoundFromFile("/sound/menu/up.wav"))
+	print ('button up')
+	sd = SoundInstance(env.loadSoundFromFile("sound/menu/up.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
 
 def playMovingSound():
-	sd = SoundInstance(env.loadSoundFromFile("/sound/move.wav"))
+	print ('on the move')
+	sd = SoundInstance(env.loadSoundFromFile("sound/move.wav"))
 	sd.setPosition( cam.getPosition() )
 	sd.setVolume(1.0)
+	sd.setWidth(20)
+	sd.play()
+
+def playBGM():
+	sd = SoundInstance(env.loadSoundFromFile("sound/bgm.wav"))
+	sd.setPosition( cam.getPosition() )
+	sd.setVolume(0.7)
 	sd.setWidth(20)
 	sd.play()
 
@@ -651,9 +781,16 @@ navi = """
 """
 
 trainDeltaT = 0
+bgmDeltaT = 0
+labelCommDeltaT = 0
 getTrainInfo()
+#playBGM()
+
 def onUpdate(frame, t, dt):
 	global trainDeltaT
+	global bgmDeltaT
+
+	print r_a
 
 	d = cam.getPosition()
 	d0 = float(d.x)
@@ -664,115 +801,24 @@ def onUpdate(frame, t, dt):
 		r=500
 	cam.getController().setSpeed(r)
 
-	if (t-trainDeltaT>=10):
-		print "updating CTA trains"
-		trainDeltaT = t
-		getTrainInfo()
+	#if (t-trainDeltaT>=10):
+	#	print "start updating CTA trains"
+	#	trainDeltaT = t
+	#	getTrainInfo()
+
+	if (t-bgmDeltaT>=86):
+		print "replaying bgm"
+		bgmDeltaT = t
+		playBGM()
+
+	if (t-labelCommDeltaT>1):
+		print "updating orientation of labelComm"
+		labelCommDeltaT = t
+		for i in range(1,78):
+			caveutil.orientWithHead(cam, labelComm[i])
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
-
-
-## HOW TO GO TO A COMMUNITY
-def goCommunities(x):
-	print "going to %s at (%f,%f)" %(comm[x].name, comm[x].lat, comm[x].lon)
-	newLat = comm[x].lat-5/110.94 # 1 lat is 110940 meters, we want 3km south to the particular point
-	newLon = comm[x].lon
-	newPos = llh2ecef(newLat, newLon, 3000) # 5000 meters high
-
-	interp.setTargetPosition(newPos)
-	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-	interp.startInterpolation()
-	playMovingSound()
-	# TO DO show data of this community
-
-# HOW TO FILTER CRIME TYPES AND YEARS
-
-notCrime = set()
-notYear = set()
-notCom = set()
-
-## CLICK CRIME TYPE FILTER BUTTONS
-def clickCrime(crime):
-	if crime==0:
-		if btnCrime[0].isChecked(): # if we want to show all
-			notCrime.clear()
-			for j in range(1,11):
-				if btnCrime[j].isChecked()==False:
-					notCrime.add(j) # collect all crimes currently not checked
-					btnCrime[j].setChecked(True)
-					clickCrime(j)
-		else: # if we want to quit show all
-			for j in notCrime:
-				btnCrime[j].setChecked(False)
-				clickCrime(j)
-	else: # individual crime type
-		if btnCrime[crime].isChecked(): # if we want to check this crime
-			for com in range(1,78):
-				for year in range(1,14):
-					n = nodeComm[com].getChildByIndex(year)
-					if nodeComm[com].isVisible() and n.isVisible():
-						n.getChildByIndex(crime).setVisible(True)
-						n.getChildByIndex(crime).setChildrenVisible(True)
-						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-					else:
-						n.getChildByIndex(crime).setVisible(True)
-		else: # if we want to uncheck this crime
-			if btnCrime[0].isChecked(): # nothing happens
-				btnCrime[crime].setChecked(True)
-				return 0
-			for com in range(1,78):
-				for year in range(1,14):
-					n = nodeComm[com].getChildByIndex(year)
-					if nodeComm[com].isVisible() and n.isVisible():
-						n.getChildByIndex(crime).setVisible(False)
-						n.getChildByIndex(crime).setChildrenVisible(False)
-						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-					else:
-						n.getChildByIndex(crime).setVisible(False)
-
-## CLICK YEAR FILTER BUTTONS
-def clickYear(year):
-	if year==0:
-		if btnYear[0].isChecked(): # if we want to show all
-			notYear.clear()
-			for j in range(1,14):
-				if btnYear[j].isChecked()==False:
-					notYear.add(j) # collect all years currently not checked
-					btnYear[j].setChecked(True)
-					clickYear(j)
-		else: # if we want to quit show all
-			for j in notYear:
-				btnCrime[j].setChecked(False)
-				clickYear(j)
-	else: # individual year
-		if btnYear[year].isChecked(): # if we want to check this year
-			for com in range(1,78):
-				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
-					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
-						nodeComm[com].setVisible(True)
-						n.setChildrenVisible(True)
-						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-					else:
-						nodeComm[com].setVisible(True)
-		else: # if we want to uncheck this year
-			if btnYear[0].isChecked(): # nothing happens
-				btnCrime[year].setChecked(True)
-				return 0
-			for com in range(1,78):
-				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
-					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
-						nodeComm[com].setVisible(False)
-						n.setChildrenVisible(False)
-						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-					else:
-						nodeComm[com].setVisible(False)
 
 
 never ="""

@@ -1,30 +1,22 @@
-<!-- 
-MapQuest - Open Aerial Map
-LOD 1-12 worldwide; 12+ US-only.
-http://developer.mapquest.com/web/products/open/map
+<!--
+osgEarth Sample
 
-NOTE: You are responsible for abiding by the provider's terms of service:
-http://developer.mapquest.com/web/info/terms-of-use
+This example pulls satellite/aerial map tiles from the Yahoo! Maps service.
 
-TIP: set your OSG_NUM_HTTP_DATABASE_THREADS to 4 or more!
+This is for educational purposes only - it is your responsibility to abide by
+the provider's terms of service when using their data.
 -->
 
-<map name="MapQuest Open Aerial" type="geocentric" version="2">
- 
-    <image name="mapquest_open_aerial" driver="xyz">
-        <url>http://oatile[1234].mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg</url>
-        <profile>spherical-mercator</profile>
-        <cache_policy usage="no_cache"/>
-        <nodata_image>http://oatile3.mqcdn.com/tiles/1.0.0/sat/13/636/6210.jpg</nodata_image>
+<map name="Yahoo! Maps" type="geocentric" version="2">
+    
+    <image name="yahoo aerial" driver="yahoo">
+        <dataset>satellite</dataset>
     </image>
     
     <options>
         <lighting>false</lighting>
-        <terrain>
-            <min_tile_range_factor>9</min_tile_range_factor>
-        </terrain>
     </options>
-    
+
     <model name="community" driver="feature_geom" enabled="true" visible="true">
         <features name="community" driver="ogr" build_spatial_index="true">
             <url>CHICAGO_DATA/commareas/CommAreas.shp</url>
@@ -49,4 +41,5 @@ TIP: set your OSG_NUM_HTTP_DATABASE_THREADS to 4 or more!
             <level max_range="100000000"/>
         </layout>
     </model>
+   
 </map>
