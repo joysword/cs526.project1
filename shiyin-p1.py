@@ -693,14 +693,14 @@ wandOldOri = Quaternion()
 
 def playBtnDownSound(e):
 	print ('button down')
-	sd = SoundInstance(env.loadSoundFromFile("sound/menu/down.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/menu/down.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
 def playBtnUpSound(e):
 	print ('button up')
-	sd = SoundInstance(env.loadSoundFromFile("sound/menu/up.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('btnUp',"sound/menu/up.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
@@ -708,18 +708,18 @@ def playBtnUpSound(e):
 
 def playMovingSound():
 	print ('on the move')
-	sd = SoundInstance(env.loadSoundFromFile("sound/move.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/move.wav"))
 	sd.setPosition( cam.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
 
 def playBGM():
-	sd = SoundInstance(env.loadSoundFromFile("sound/bgm.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.wav"))
 	sd.setPosition( cam.getPosition() )
-	sd.setVolume(0.7)
+	sd.setVolume(0.3)
 	sd.setWidth(20)
-	sd.play()
+	#sd.play()
 
 uim = UiModule.createAndInitialize()
 wf = uim.getWidgetFactory()
@@ -733,52 +733,70 @@ legend.setPosition(Vector2(854,480)-legend.getSize())
 
 def onEvent():
 	global userScaleFactor
+	global isButton7down
+	global wandOldPos
 
 	e = getEvent()
 
 	if (e.isButtonDown(EventFlags.ButtonLeft)):
 		playBtnDownSound(e)
-		print("Left button pressed")
+		print("changing map")
 		if torus1.isVisible():
 			torus1.setVisible(False)
 			torus2.setVisible(True)
-		else:
-			torus1.setVisible(True)
+		elif torus2.isVisible():
 			torus2.setVisible(False)
+			torus3.setVisible(True)
+		elif torus3.isVisible():
+			torus3.setVisible(False)
+			torus4.setVisible(True)
+		else:
+			torus4.setVisible(False)
+			torus1.setVisible(True)
 
 	elif (e.isButtonDown(EventFlags.Button7)):
 		playBtnDownSound(e)
+		#if isButton7down==False:
 		isButton7down = True
 		wandOldPos = e.getPosition()
 		wandOldOri = e.getOrientation()
+		print "wandOldPos:",wandOldPos
+		print "wandOldOri:",wandOldOri
 
 	elif (e.isButtonUp(EventFlags.Button7)):
 		isButton7down = False
+
+	elif (e.isButtonDown(EventFlags.Button2)):
+		playBtnDownSound(e)
+
+	elif (e.isButtonUp(EventFlags.Button2)):
+		playBtnUpSound(e)
+
+	elif (e.isButtonDown(EventFlags.Button3)):
+		playBtnDownSound(e)
+
+	elif (e.isButtonUp(EventFlags.Button3)):
+		playBtnUpSound(e)
 	
 	elif (e.getType()==EventType.Update) and (isButton7down):
-		wandPos = e.getPosition()
-		cam.setPosition( cam.getPosition() + (wandPos-wandOldPos)*cam.getController().getSpeed()*0.01 )
-		wandOri = e.getOrientation()
-		cam.setOrientation( cam.getOrientation() + (wandOri-wandOldOrientation)*0.01 )
+		e.getAxis(0)
 
-navi = """
-	elif e.isKeyDown(ord('j')):
-		cam.setPosition( cam.convertLocalToWorldPosition(cam.getPosition() + Vector3(-1,0,0)*100 )
-	elif e.isKeyDown(ord('l')):
-		cam.setPosition( cam.getPosition() + Vector3(1,0,0)*100 )
-	elif e.isKeyDown(ord('i')):
-		cam.setPosition( cam.getPosition() + Vector3(0,0,-1)*100 )
-	elif e.isKeyDown(ord('k')):
-		cam.setPosition( cam.getPosition() + Vector3(0,0,1)*100 )
-	elif e.isKeyDown(ord('y')):
-		cam.setPosition( cam.getPosition() + Vector3(0,1,0)*100 )
-	elif e.isKeyDown(ord('h')):
-		cam.setPosition( cam.getPosition() + Vector3(0,-1,0)*100 )
+	elif e.isKeyDown(ord('j')): # left
+		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(-1,0,0)*100 ) )
+	elif e.isKeyDown(ord('l')): # right
+		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(1,0,0)*100 ) )
+	elif e.isKeyDown(ord('i')): # forward
+		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,0,-1)*100 ) )
+	elif e.isKeyDown(ord('k')): # backward
+		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,0,1)*100 ) )
+	elif e.isKeyDown(ord('y')): # up
+		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,1,0)*100 ) )
+	elif e.isKeyDown(ord('h')): # down
+		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,-1,0)*100 ) )
 	#elif e.isKeyDown(ord('x')):
 	#	cam.setOrientation( cam.getOrientation() + Vector3() )
 	#elif e.isKeyDown(ord('e')):
 	#	cam.setOrientation( cam.getOrientation() + Vector3() )
-"""
 
 trainDeltaT = 0
 bgmDeltaT = 0
@@ -789,17 +807,16 @@ getTrainInfo()
 def onUpdate(frame, t, dt):
 	global trainDeltaT
 	global bgmDeltaT
-
-	print r_a
+	global labelCommDeltaT
 
 	d = cam.getPosition()
 	d0 = float(d.x)
 	d1 = float(d.y)
 	d2 = float(d.z)
 	r = math.sqrt(d0*d0 + d1*d1 + d2*d2) - r_a # altitude in cm
-	if r<500:
-		r=500
-	cam.getController().setSpeed(r)
+	if r<400:
+		r=400
+	cam.getController().setSpeed(r*1.2)
 
 	#if (t-trainDeltaT>=10):
 	#	print "start updating CTA trains"
@@ -812,7 +829,6 @@ def onUpdate(frame, t, dt):
 		playBGM()
 
 	if (t-labelCommDeltaT>1):
-		print "updating orientation of labelComm"
 		labelCommDeltaT = t
 		for i in range(1,78):
 			caveutil.orientWithHead(cam, labelComm[i])
