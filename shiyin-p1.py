@@ -153,10 +153,10 @@ def clickYear(year):
 					else:
 						nodeComm[com].setVisible(False)
 
-## CLICK HOUR FILTER BUTTON
+# SHOW CRIME AS HOUR/DAY/SEASON
 def clickMoreInfo(x):
 	if x==0:
-		print ("nothing")
+		print ('nothing')
 	elif x==1:
 		print ('hour of day')
 	elif x==2:
@@ -169,7 +169,7 @@ class community:
 	lat = 0
 	lon = 0
 	pos = Vector3()
-	numCrime = [[0]*11]*14
+	numCrime = [[0]*11 for i in range(0,14)]
 	numCrimeShown = 0
 	def __init__(self, n, x, y):
 		self.name = n
@@ -177,7 +177,7 @@ class community:
 		self.lon = y
 		self.pos = llh2ecef(x,y,0)
 		self.numCrimeShown = 0
-		self.numCrime = [[0]*11]*14
+		self.numCrime = [[0]*11 for xx in range(0,14)]
 	def watchme(self):
 		print ("watching community %s" %(self.name))
 

@@ -27,6 +27,18 @@ for line in csvread:
 		hour-=12
 	#print hour
 	csvwrite.writerow((line[0],week,line[2],line[3],line[4],line[5],line[6],line[7],month,day,hour))
-	
+
+# 0 ID
+# 1 day of week
+# 2 type
+# 3 description
+# 4 comm
+# 5 year
+# 6 lat
+# 7 lon
+# 8 month
+# 9 date
+# 10 hour
+
 f.close()
 res.close()
