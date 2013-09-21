@@ -80,17 +80,15 @@ def clickCrime(crime):
 			for com in range(1,78):
 				for year in range(1,14):
 					n = nodeComm[com].getChildByIndex(year)
-					if n.isVisible():
-						n.getChildByIndex(crime).setVisible(True)
+					n.getChildByIndex(crime).setVisible(True)
+					if n.isVisible(): # if this year is visible, toggle crime drawables
 						n.getChildByIndex(crime).setChildrenVisible(True)
 						if (com==32):
 							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
 						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
 						if (com==32):
 							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
-					else:
-						n.getChildByIndex(crime).setVisible(True)
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
 		else: # if we want to uncheck this crime
 			if btnCrime[0].isChecked(): # nothing happens
 				btnCrime[crime].setChecked(True)
@@ -98,13 +96,15 @@ def clickCrime(crime):
 			for com in range(1,78):
 				for year in range(1,14):
 					n = nodeComm[com].getChildByIndex(year)
-					if n.isVisible():
-						n.getChildByIndex(crime).setVisible(False)
+					n.getChildByIndex(crime).setVisible(False)
+					if n.isVisible(): # if this year is visible, toggle crime drawables
 						n.getChildByIndex(crime).setChildrenVisible(False)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
 						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
 						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-					else:
-						n.getChildByIndex(crime).setVisible(False)
 
 ## CLICK YEAR FILTER BUTTONS
 def clickYear(year):
@@ -118,36 +118,51 @@ def clickYear(year):
 					clickYear(j)
 		else: # if we want to quit show all
 			for j in notYear:
-				btnCrime[j].setChecked(False)
+				btnYear[j].setChecked(False)
 				clickYear(j)
 	else: # individual year
 		if btnYear[year].isChecked(): # if we want to check this year
 			for com in range(1,78):
 				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
-					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
-						nodeComm[com].setVisible(True)
-						n.setChildrenVisible(True)
+					n = nodeComm[com].getChildByIndex(year)
+					n.setVisible(True)
+					if n.getChildByIndex(crime).isVisible(): # if this crime is visible, toggle crime drawables
+						n.getChildByIndex(crime).setChildrenVisible(True)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
 						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
 						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-					else:
-						nodeComm[com].setVisible(True)
 		else: # if we want to uncheck this year
 			if btnYear[0].isChecked(): # nothing happens
 				btnCrime[year].setChecked(True)
 				return 0
 			for com in range(1,78):
 				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year).getChildByIndex(crime)
-					if nodeComm[com].getChildByIndex(year).isVisible() and n.isVisible():
-						nodeComm[com].setVisible(False)
-						n.setChildrenVisible(False)
+					n = nodeComm[com].getChildByIndex(year)
+					n.setVisible(False)
+					if n.getChildByIndex(crime).isVisible(): # if this crime is visible, toggle crime drawables
+						n.getChildByIndex(crime).setChildrenVisible(False)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
 						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
 						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
 					else:
 						nodeComm[com].setVisible(False)
 
-
+## CLICK HOUR FILTER BUTTON
+def clickMoreInfo(x):
+	if x==0:
+		print ("nothing")
+	elif x==1:
+		print ('hour of day')
+	elif x==2:
+		print ('day of week')
+	elif x==3:
+		print ('season of year')
 
 class community:
 	name = ''
@@ -373,7 +388,7 @@ btnCrime[10].setText("Aggravated Sexual Assault")
 menu1_2filter = menu0_chicago.addSubMenu("FILTER YEARS")
 cc = menu1_2filter.getContainer()
 btnYear = [None]*14
-for ii in range(0,14):
+for ii in range(0,14): # from 2013 to 2001
 	if (ii==0):
 		btnYear[0] = Button.create(cc)
 		btnYear[0].setCheckable(True)
@@ -389,8 +404,36 @@ for ii in range(0,14):
 		btnYear[i].setText(str(2000+i))
 btnYear[13].setChecked(True)
 
-menu1_2simu = menu0_chicago.addSubMenu("REAL TIME WATCH")
-cc = menu1_2simu.getContainer()
+menu1_3more = menu0_chicago.addSubMenu("MORE INFO")
+cc = menu1_3more.getContainer()
+btn_none = Button.create(cc)
+btn_none.setUIEventCommand('clickMoreInfo(0)')
+btn_none.setCheckable(True)
+btn_none.setRadio(True)
+btn_none.setChecked(True)
+btn_none.setText('no more info')
+
+btn_hour = Button.create(cc)
+btn_hour.setUIEventCommand('clickMoreInfo(1)')
+#btn_hour.setChecked(True)
+btn_hour.setCheckable(True)
+btn_hour.setRadio(True)
+btn_hour.setText('hour of day')
+
+btn_day = Button.create(cc)
+btn_day.setUIEventCommand('clickMoreInfo(2)')
+btn_day.setCheckable(True)
+btn_day.setRadio(True)
+btn_day.setText('day of week')
+
+btn_season = Button.create(cc)
+btn_season.setUIEventCommand('clickMoreInfo(3)')
+btn_season.setCheckable(True)
+btn_season.setRadio(True)
+btn_season.setText('season of year')
+
+menu1_4simu = menu0_chicago.addSubMenu("REAL TIME WATCH")
+cc = menu1_4simu.getContainer()
 label_simu = Label.create(cc)
 label_simu.setText("TEST SIMULATION")
 # TO DO simulation
