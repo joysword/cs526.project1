@@ -782,21 +782,36 @@ def onEvent():
 		e.getAxis(0)
 
 	elif e.isKeyDown(ord('j')): # left
-		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(-1,0,0)*100 ) )
+		#cam.setPosition( cam.convertLocalToWorldPosition( Vector3(-1,0,0)*100 ) )
+		cam.translate( -100, 0, 0, Space.Local )
 	elif e.isKeyDown(ord('l')): # right
-		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(1,0,0)*100 ) )
+		#cam.setPosition( cam.convertLocalToWorldPosition( Vector3(1,0,0)*100 ) )
+		cam.translate( 100, 0, 0, Space.Local )
 	elif e.isKeyDown(ord('i')): # forward
-		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,0,-1)*100 ) )
+		#cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,0,-1)*100 ) )
+		cam.translate( 0, 0, -100, Space.Local )
 	elif e.isKeyDown(ord('k')): # backward
-		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,0,1)*100 ) )
+		#cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,0,1)*100 ) )
+		cam.translate( 0, 0, 100, Space.Local )
 	elif e.isKeyDown(ord('y')): # up
-		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,1,0)*100 ) )
+		#cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,1,0)*100 ) )
+		cam.translate( 0, 100, 0, Space.Local )
 	elif e.isKeyDown(ord('h')): # down
-		cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,-1,0)*100 ) )
-	#elif e.isKeyDown(ord('x')):
-	#	cam.setOrientation( cam.getOrientation() + Vector3() )
-	#elif e.isKeyDown(ord('e')):
-	#	cam.setOrientation( cam.getOrientation() + Vector3() )
+		#cam.setPosition( cam.convertLocalToWorldPosition( Vector3(0,-1,0)*100 ) )
+		cam.translate( 0, -100, 0, Space.Local )
+	elif e.isKeyDown(ord('b')):
+		cam.rotate( Vector3(1,0,0), 10*math.pi/180, Space.Local )
+	elif e.isKeyDown(ord('n')):
+		cam.rotate( Vector3(-1,0,0), 10*math.pi/180, Space.Local )
+
+	elif e.getServiceType() == ServiceType.Wand:
+		if isButton7down:
+			trans = e.getPosition()-wandOldPos
+			cam.setPosition( cam.convertLocalToWorldPosition( trans*300 ) )
+
+			oriVecOld = quaternionToEuler(wandOldOri)
+			oriVec = quaternionToEuler(wandOri)
+			cam.rotate( oriVec-oriVecOld, 5*math.pi/180, Space.Local )
 
 trainDeltaT = 0
 bgmDeltaT = 0
