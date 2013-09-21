@@ -80,7 +80,7 @@ def clickCrime(crime):
 			for com in range(1,78):
 				for year in range(1,14):
 					n = nodeComm[com].getChildByIndex(year)
-					if nodeComm[com].isVisible() and n.isVisible():
+					if n.isVisible():
 						n.getChildByIndex(crime).setVisible(True)
 						n.getChildByIndex(crime).setChildrenVisible(True)
 						if (com==32):
@@ -98,7 +98,7 @@ def clickCrime(crime):
 			for com in range(1,78):
 				for year in range(1,14):
 					n = nodeComm[com].getChildByIndex(year)
-					if nodeComm[com].isVisible() and n.isVisible():
+					if n.isVisible():
 						n.getChildByIndex(crime).setVisible(False)
 						n.getChildByIndex(crime).setChildrenVisible(False)
 						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
@@ -162,6 +162,7 @@ class community:
 		self.lon = y
 		self.pos = llh2ecef(x,y,0)
 		self.numCrimeShown = 0
+		self.numCrime = [[0]*11]*14
 	def watchme(self):
 		print ("watching community %s" %(self.name))
 
@@ -355,6 +356,7 @@ for i in range(0,11):
 	btnCrime[i].setCheckable(True)
 	btnCrime[i].setChecked(True)
 	btnCrime[i].setUIEventCommand('clickCrime('+str(i)+')')
+btnCrime[0].setChecked(False)
 
 btnCrime[0].setText("ALL MAJOR CRIMES")
 btnCrime[1].setText("Homicide")
@@ -597,24 +599,26 @@ def getTrainInfo():
 	print ("updated!")
 
 # VICE CITY
-#sincity="""
+#viceCity="""
 
 nodeComm = [None]*78
 nodeYear = [None]*14
 nodeCrime = [None]*11
 
-nodeSinCityParent = SceneNode.create('VICE CITY')
-all.addChild(nodeSinCityParent)
+nodeViceCityParent = SceneNode.create('VICE CITY')
+all.addChild(nodeViceCityParent)
 
 for i in range(0,78):
 	name = "comm"+str(i)
 	nodeComm[i] = SceneNode.create(name)
-	nodeComm[i].setVisible(True)
-	nodeSinCityParent.addChild(nodeComm[i])
+	nodeViceCityParent.addChild(nodeComm[i])
 	for j in range(0,14):
 		name1 = name+"year"+str(2000+j)
 		nodeYear[j] = SceneNode.create(name1)
-		nodeYear[j].setVisible(True)
+		if (j==13):
+			nodeYear[j].setVisible(True)
+		else:
+			nodeYear[j].setVisible(False)
 		nodeComm[i].addChild(nodeYear[j])
 		for k in range(0,11):
 			name2 = name1+"crimetype"+str(k)
@@ -627,6 +631,8 @@ lines = csv.reader(f)
 atLine = 0
 for items in lines:
 	atLine+=1
+	if (atLine>1000):
+		break
 	crime_type = items[2]
 	crime_comm = int(items[4])
 	crime_year = int(items[5])
@@ -643,14 +649,14 @@ for items in lines:
 	crimeIcon.getMaterial().setLit(False)
 	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(crimeIcon)
 	comm[crime_comm].numCrime[crime_year-2000][crimeType[crime_type]]+=1
-	if crime_year==2013:
-		comm[crime_comm].numCrimeShown+=1
-	if (atLine>1000):
-		break
+ 	if crime_year==2013:
+ 		comm[crime_comm].numCrimeShown+=1
 f.close()
 
 for k in range(1,11):
 	print "loop's # of crime in 2013 [%d] = %d" %(k,comm[32].numCrime[13][k])
+
+print "comm[32].numCrimeShown:",comm[32].numCrimeShown
 
 labelComm = [None]*78
 
@@ -669,10 +675,6 @@ for i in range(1,78):
 	all.addChild(labelComm[i])
 
 toggleStereo()
-
-#put the camera to Chicago
-# it would be better to set the speed based on the height over the surface
-# to move slower as you get closer
 
 # TEST FACE CAMERA
 #testObject = PlaneShape.create(20, 20)
@@ -721,6 +723,7 @@ def playBGM():
 	sd.setWidth(20)
 	#sd.play()
 
+# TO DO: LEGEND
 uim = UiModule.createAndInitialize()
 wf = uim.getWidgetFactory()
 ui = uim.getUi()
@@ -816,7 +819,7 @@ def onEvent():
 trainDeltaT = 0
 bgmDeltaT = 0
 labelCommDeltaT = 0
-getTrainInfo()
+#getTrainInfo()
 #playBGM()
 
 def onUpdate(frame, t, dt):
@@ -834,9 +837,9 @@ def onUpdate(frame, t, dt):
 	cam.getController().setSpeed(r*1.2)
 
 	#if (t-trainDeltaT>=10):
-	#	print "start updating CTA trains"
-	#	trainDeltaT = t
-	#	getTrainInfo()
+		#print "start updating CTA trains"
+		#trainDeltaT = t
+		#getTrainInfo()
 
 	if (t-bgmDeltaT>=86):
 		print "replaying bgm"
