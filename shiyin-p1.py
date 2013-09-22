@@ -257,46 +257,38 @@ comm[54] = community("Riverdale", 41.66, -87.61)
 comm[55] = community("Hegewisch", 41.66, -87.55)
 
 # SHOW CRIME AS HOUR/DAY/SEASON
-nodeHourParent = SceneNode.create('nodeHourParent')
-nodeDayParent = SceneNode.create('nodeDayParent')
-nodeSeasonParent = SceneNode.create('nodeSeasonParent')
+nodeHDSParent = SceneNode.create('nodeHDSParent')
 
-all.addChild(nodeHourParent)
-all.addChild(nodeDayParent)
-all.addChild(nodeSeasonParent)
+all.addChild(nodeHDSParent)
 
-nodeHour = [[None]*4 for i in range(78)]
-nodeDay = [[None]*7 for i in range(78)]
-nodeSeason = [[None]*4 for i in range(78)]
+nodeHDS = [[None]*7 for i in range(78)]
 
 for i in range(1,78):
-	for j in range(4):
-		nodeHour[i][j] = SceneNode.create('nodeHour'+str(i)+'_'+str(j))
-		nodeSeason[i][j] = SceneNode.create('nodeSeason'+str(i)+'_'+str(j))
-		nodeHourParent.addChild(nodeHour[i][j])
-		nodeSeasonParent.addChild(nodeSeason[i][j])
 	for j in range(7):
-		nodeDay[i][j] = SceneNode.create('nodeDay'+str(i)+'_'+str(j))
-		nodeDayParent.addChild(nodeDay[i][j])
+		nodeHDS[i][j] = BoxShape.create(200,1000,200)
+		nodeHDSParent.addChild(nodeHDS[i][j])
+nodeHDSParent.setChildrenVisible(False)
 
 # HOW TO FILTER CRIME TYPES AND YEARS AND MORE
 
 notCrime = set()
 notYear = set()
 notCom = set()
-needUpdateHour = True
-needUpdateDay = True
-needUpdateSeason = True
+needUpdateHDS = True
 
 ## CLICK CRIME TYPE FILTER BUTTONS
 def clickCrime(crime):
-	global needUpdateDay
-	global needUpdateHour
-	global needUpdateSeason
+	#global needUpdateDay
+	#global needUpdateHour
+	#global needUpdateSeason
+	global needUpdateHDS
 
-	needUpdateHour = True
-	needUpdateDay = True
-	needUpdateSeason = True
+	#needUpdateHour = True
+	#needUpdateDay = True
+	#needUpdateSeason = True
+	if btn_none.isChecked==False:
+		needUpdateHDS = True
+
 	if crime==0:
 		if btnCrime[0].isChecked(): # if we want to show all
 			notCrime.clear()
@@ -342,13 +334,17 @@ def clickCrime(crime):
 
 ## CLICK YEAR FILTER BUTTONS
 def clickYear(year):
-	global needUpdateDay
-	global needUpdateHour
-	global needUpdateSeason
+	#global needUpdateDay
+	#global needUpdateHour
+	#global needUpdateSeason
+	global needUpdateHDS
 
-	needUpdateHour = True
-	needUpdateDay = True
-	needUpdateSeason = True
+	#needUpdateHour = True
+	#needUpdateDay = True
+	#needUpdateSeason = True
+	if btn_none.isChecked==False:
+		needUpdateHDS = True
+
 	if year==0:
 		if btnYear[0].isChecked(): # if we want to show all
 			notYear.clear()
@@ -396,145 +392,147 @@ def clickYear(year):
 
 ## CLICK INFO FILTER BUTTONS
 def clickMoreInfo():
-	global needUpdateDay
-	global needUpdateHour
-	global needUpdateSeason
+	global needUpdateHDS
 
 	if btn_none.isChecked(): # nothing
-		nodeHourParent.setChildrenVisible(False)
-		nodeDayParent.setChildrenVisible(False)
-		nodeSeasonParent.setChildrenVisible(False)
+		needUpdateHDS = False
+		nodeHDSParent.setChildrenVisible(False)
+
 	elif btn_hour.isChecked(): # hour
-		print ('btn_hour is checked')
-		nodeHourParent.setChildrenVisible(True)
-		nodeDayParent.setChildrenVisible(False)
-		nodeSeasonParent.setChildrenVisible(False)
-		if needUpdateHour:
-			needUpdateHour = False
-			for i in range(1,78):
-				comm[i].numHour = [0]*4
-			f = open('CrimesAll__hour.csv','rb')
-			csvHourRead = csv.reader(f)
-			for line in csvHourRead:
-				if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
-					com = int(line[0])
-					comm[com].numHour[0]+=int(line[3])
-					comm[com].numHour[1]+=int(line[4])
-					comm[com].numHour[2]+=int(line[5])
-					comm[com].numHour[3]+=int(line[6])
-			f.close()
-			numHourMax = 0
+		needUpdateHDS = False
+		nodeHDSParent.setChildrenVisible(False)
+
+		for i in range(1,78):
+			comm[i].numHour = [0]*4
+		f = open('CrimesAll__hour.csv','rb')
+		csvHourRead = csv.reader(f)
+		for line in csvHourRead:
+			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+				com = int(line[0])
+				comm[com].numHour[0]+=int(line[3])
+				comm[com].numHour[1]+=int(line[4])
+				comm[com].numHour[2]+=int(line[5])
+				comm[com].numHour[3]+=int(line[6])
+		f.close()
+
+		numHourMax = 0
+		for com in range(1,78):
+			for i in range(4):
+				if comm[com].numHour[i]>numHourMax:
+					numHourMax = comm[com].numHour[i]
+
+		if (numHourMax!=0):
 			for com in range(1,78):
 				for i in range(4):
-					if comm[com].numHour[i]>numHourMax:
-						numHourMax = comm[com].numHour[i]
-			if (numHourMax!=0):
-				for com in range(1,78):
-					for i in range(4):
-						ratio = (comm[com].numHour[i]+0.0)/(numHourMax+0.0)
-						nodeHour[com][i] = BoxShape.create(150,1000*ratio,150)
-						nodeHour[com][i].setPosition(comm[com].pos)
-						caveutil.orientWithHead(cam,nodeHour[com][i])
-						nodeHour[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
-						if (ratio > 0.8):
-							nodeHour[com][i].setEffect('colored -d #A23333')
-						elif (ratio > 0.6):
-							nodeHour[com][i].setEffect('colored -d #EA6A40')
-						elif (ratio > 0.4):
-							nodeHour[com][i].setEffect('colored -d #DCA53D')
-						elif (ratio > 0.2):
-							nodeHour[com][i].setEffect('colored -d #4F9337')
-						else:
-							nodeHour[com][i].setEffect('colored -d silver')
+					ratio = (comm[com].numHour[i]+0.0)/(numHourMax+0.0)
+					nodeHDS[com][i].setPosition(comm[com].pos)
+					caveutil.orientWithHead(cam,nodeHDS[com][i])
+					nodeHDS[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
+					nodeHDS[com][i].setScale(1,ratio,1)
+
+					if (ratio > 0.8):
+						nodeHDS[com][i].setEffect('colored -d #A23333')
+					elif (ratio > 0.6):
+						nodeHDS[com][i].setEffect('colored -d #EA6A40')
+					elif (ratio > 0.4):
+						nodeHDS[com][i].setEffect('colored -d #DCA53D')
+					elif (ratio > 0.2):
+						nodeHDS[com][i].setEffect('colored -d #4F9337')
+					else:
+						nodeHDS[com][i].setEffect('colored -d silver')
+					nodeHDS[com][i].setVisible(True)
+
 	elif btn_day.isChecked(): # day
-		print ('btn_day is checked')
-		nodeHourParent.setChildrenVisible(False)
-		nodeDayParent.setChildrenVisible(True)
-		nodeSeasonParent.setChildrenVisible(False)
-		for i in range(0,nodeHourParent.numChildren()):
-			print "child:",i,nodeHourParent.getChildByIndex(i).isVisible()
-		if needUpdateDay:
-			needUpdateDay = False
-			for i in range(1,78):
-				comm[i].numDay = [0]*7
-			f = open('CrimesAll__day.csv','rb')
-			csvDayRead = csv.reader(f)
-			for line in csvDayRead:
-				if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
-					com = int(line[0])
-					comm[com].numDay[0]+=int(line[3])
-					comm[com].numDay[1]+=int(line[4])
-					comm[com].numDay[2]+=int(line[5])
-					comm[com].numDay[3]+=int(line[6])
-					comm[com].numDay[4]+=int(line[7])
-					comm[com].numDay[5]+=int(line[8])
-					comm[com].numDay[6]+=int(line[9])
-			f.close()
-			numDayMax = 0
+		needUpdateHDS = False
+
+		for i in range(1,78):
+			comm[i].numDay = [0]*7
+		f = open('CrimesAll__day.csv','rb')
+		csvDayRead = csv.reader(f)
+		for line in csvDayRead:
+			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+				com = int(line[0])
+				comm[com].numDay[0]+=int(line[3])
+				comm[com].numDay[1]+=int(line[4])
+				comm[com].numDay[2]+=int(line[5])
+				comm[com].numDay[3]+=int(line[6])
+				comm[com].numDay[4]+=int(line[7])
+				comm[com].numDay[5]+=int(line[8])
+				comm[com].numDay[6]+=int(line[9])
+		f.close()
+
+		numDayMax = 0
+		for com in range(1,78):
+			for i in range(7):
+				if comm[com].numDay[i]>numDayMax:
+					numDayMax = comm[com].numDay[i]
+
+		if (numDayMax!=0):
 			for com in range(1,78):
 				for i in range(7):
-					if comm[com].numDay[i]>numDayMax:
-						numDayMax = comm[com].numDay[i]
-			if (numDayMax!=0):
-				for com in range(1,78):
-					for i in range(7):
-						ratio = (comm[com].numDay[i]+0.0)/(numDayMax+0.0)
-						nodeDay[com][i] = BoxShape.create(150,1000*ratio,150)
-						nodeDay[com][i].setPosition(comm[com].pos)
-						caveutil.orientWithHead(cam,nodeDay[com][i])
-						nodeDay[com][i].translate(200*(i-3),500*ratio+200,0, Space.Local)
-						if (ratio > 0.8):
-							nodeDay[com][i].setEffect('colored -d #A23333')
-						elif (ratio > 0.6):
-							nodeDay[com][i].setEffect('colored -d #EA6A40')
-						elif (ratio > 0.4):
-							nodeDay[com][i].setEffect('colored -d #DCA53D')
-						elif (ratio > 0.2):
-							nodeDay[com][i].setEffect('colored -d #4F9337')
-						else:
-							nodeDay[com][i].setEffect('colored -d silver')
+					ratio = (comm[com].numDay[i]+0.0)/(numDayMax+0.0)
+					nodeHDS[com][i].setPosition(comm[com].pos)
+					caveutil.orientWithHead(cam,nodeHDS[com][i])
+					nodeHDS[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
+					nodeHDS[com][i].setScale(1,ratio,1)
+
+					if (ratio > 0.8):
+						nodeHDS[com][i].setEffect('colored -d #A23333')
+					elif (ratio > 0.6):
+						nodeHDS[com][i].setEffect('colored -d #EA6A40')
+					elif (ratio > 0.4):
+						nodeHDS[com][i].setEffect('colored -d #DCA53D')
+					elif (ratio > 0.2):
+						nodeHDS[com][i].setEffect('colored -d #4F9337')
+					else:
+						nodeHDS[com][i].setEffect('colored -d silver')
+			nodeHDSParent.setChildrenVisible(True)
+		else:
+			nodeHDSParent.setChildrenVisible(False)
+
 	elif btn_season.isChecked(): # season
-		print ('btn_season is checked')
-		nodeHourParent.setChildrenVisible(False)
-		nodeDayParent.setChildrenVisible(False)
-		nodeSeasonParent.setChildrenVisible(True)
-		if needUpdateSeason:
-			needUpdateSeason = False
-			for i in range(1,78):
-				comm[i].numSeason = [0]*4
-			f = open('CrimesAll__season.csv','rb')
-			csvSeasonRead = csv.reader(f)
-			for line in csvSeasonRead:
-				if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
-					com = int(line[0])
-					comm[com].numSeason[0]+=int(line[3])
-					comm[com].numSeason[1]+=int(line[4])
-					comm[com].numSeason[2]+=int(line[5])
-					comm[com].numSeason[3]+=int(line[6])
-			f.close()
-			numSeasonMax = 0
+		needUpdateHDS = False
+		nodeHDSParent.setChildrenVisible(False)
+
+		for i in range(1,78):
+			comm[i].numSeason = [0]*4
+		f = open('CrimesAll__season.csv','rb')
+		csvSeasonRead = csv.reader(f)
+		for line in csvSeasonRead:
+			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+				com = int(line[0])
+				comm[com].numSeason[0]+=int(line[3])
+				comm[com].numSeason[1]+=int(line[4])
+				comm[com].numSeason[2]+=int(line[5])
+				comm[com].numSeason[3]+=int(line[6])
+		f.close()
+
+		numSeasonMax = 0
+		for com in range(1,78):
+			for i in range(4):
+				if comm[com].numSeason[i]>numSeasonMax:
+					numSeasonMax = comm[com].numSeason[i]
+
+		if (numSeasonMax!=0):
 			for com in range(1,78):
 				for i in range(4):
-					if comm[com].numSeason[i]>numSeasonMax:
-						numSeasonMax = comm[com].numSeason[i]
-			if (numSeasonMax!=0):
-				for com in range(1,78):
-					for i in range(4):
-						ratio = (comm[com].numSeason[i]+0.0)/(numSeasonMax+0.0)
-						nodeSeason[com][i] = BoxShape.create(150,1000*ratio,150)
-						nodeSeason[com][i].setPosition(comm[com].pos)
-						caveutil.orientWithHead(cam,nodeSeason[com][i])
-						nodeSeason[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
-						if (ratio > 0.8):
-							nodeSeason[com][i].setEffect('colored -d #A23333')
-						elif (ratio > 0.6):
-							nodeSeason[com][i].setEffect('colored -d #EA6A40')
-						elif (ratio > 0.4):
-							nodeSeason[com][i].setEffect('colored -d #DCA53D')
-						elif (ratio > 0.2):
-							nodeSeason[com][i].setEffect('colored -d #4F9337')
-						else:
-							nodeSeason[com][i].setEffect('colored -d silver')
+					ratio = (comm[com].numSeason[i]+0.0)/(numSeasonMax+0.0)
+					nodeHDS[com][i].setPosition(comm[com].pos)
+					caveutil.orientWithHead(cam,nodeHDS[com][i])
+					nodeHDS[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
+					nodeHDS[com][i].setScale(1,ratio,1)
+
+					if (ratio > 0.8):
+						nodeHDS[com][i].setEffect('colored -d #A23333')
+					elif (ratio > 0.6):
+						nodeHDS[com][i].setEffect('colored -d #EA6A40')
+					elif (ratio > 0.4):
+						nodeHDS[com][i].setEffect('colored -d #DCA53D')
+					elif (ratio > 0.2):
+						nodeHDS[com][i].setEffect('colored -d #4F9337')
+					else:
+						nodeHDS[com][i].setEffect('colored -d silver')
+					nodeHDS[com][i].setVisible(True)
 
 ##############################################################################################################
 # CREATE MENUS
@@ -683,27 +681,27 @@ btnYear[13].setChecked(True)
 menu1_3more = menu0_chicago.addSubMenu("MORE INFO")
 cc = menu1_3more.getContainer()
 btn_none = Button.create(cc)
-btn_none.setUIEventCommand('clickMoreInfo')
+btn_none.setUIEventCommand('clickMoreInfo()')
 btn_none.setCheckable(True)
 btn_none.setRadio(True)
 btn_none.setChecked(True)
 btn_none.setText('no more info')
 
 btn_hour = Button.create(cc)
-btn_hour.setUIEventCommand('clickMoreInfo')
+btn_hour.setUIEventCommand('clickMoreInfo()')
 #btn_hour.setChecked(True)
 btn_hour.setCheckable(True)
 btn_hour.setRadio(True)
 btn_hour.setText('hour of day')
 
 btn_day = Button.create(cc)
-btn_day.setUIEventCommand('clickMoreInfo')
+btn_day.setUIEventCommand('clickMoreInfo()')
 btn_day.setCheckable(True)
 btn_day.setRadio(True)
 btn_day.setText('day of week')
 
 btn_season = Button.create(cc)
-btn_season.setUIEventCommand('clickMoreInfo')
+btn_season.setUIEventCommand('clickMoreInfo()')
 btn_season.setCheckable(True)
 btn_season.setRadio(True)
 btn_season.setText('season of year')
@@ -1068,7 +1066,9 @@ def onUpdate(frame, t, dt):
 		labelCommDeltaT = t
 		for i in range(1,78):
 			caveutil.orientWithHead(cam, labelComm[i])
-		if needUpdateHour or needUpdateSeason or needUpdateDay:
+		#if needUpdateHour or needUpdateSeason or needUpdateDay:
+		if needUpdateHDS:
+			print ('needUpdateHDS is True, start do it again')
 			clickMoreInfo()
 
 setEventFunction(onEvent)
