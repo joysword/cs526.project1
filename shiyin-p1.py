@@ -499,24 +499,178 @@ def clickMoreInfo():
 # SIMULATION FUNCTIONS
 isWatching = False
 isPlaying = 0
-sim_atDate
+sim_minute = 0
+sim_node = [None]*5000 # only first 5000 nodes
+sim_node_min = [0]*5000
+sim_at_line = 0
+#sim_isCheck = [[False]*11 for i in range(14)] for j in range(78)
 
+## TIMER
+uim = UiModule.createAndInitialize()
+wf = uim.getWidgetFactory()
+ui = uim.getUi()
+timer = wf.createLabel('timer', ui, '01-01 00:00')
+timer.setColor(Color('white'))
+if caveutil.isCAVE():
+	timer.setFont('font/helvetica.ttf 100')
+	timer.setPosition(Vector2(4000,0))
+else:
+	timer.setFont('font/helvetica.ttf 20')
+	timer.setPosition(Vector2(400,0))
+timer.setVisible(False)
+
+## enter and quit
 def IOWatchMode(x):
 	global isWatching
 	global isPlaying
+	global sim_minute
+	global timer
+	global sim_at_line
+
 	if x==1:
-		isWatching=True
+		if (isWatching==False):
+			isWatching=True
+			btn_none.setChecked(True)
+			clickMoreInfo()
+			for com in range(1,78):
+				labelComm[com].setText(comm[com].name)
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					for crime in range(1,11):
+						#sim_isCheck[com][year][crime] = n.getChildByIndex(crime).isVisible()
+						n.getChildByIndex(crime).setChildrenVisible(False)
+			f = open('Crimes2012_final_numday.csv','rb')
+			simread = csv.reader(f)
+			i = 0
+			for line in simread:
+				if i==5000:
+					break
+				crime_type = line[1]
+				crime_lat = float(line[4])
+				crime_lon = float(line[5])
+				crime_minute = int(line[7])
+				crime_com = int(line[3])
+				sim_node[i] = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
+				sim_node[i].setPosition(llh2ecef(crime_lat, crime_lon, 100.0))
+				sim_node[i].getMaterial().setLit(False)
+				sim_node[i].setVisible(False)
+				sim_node_min[i] = crime_minute
+				i+=1
+			timer.setVisible(True)
+			print ('ready')
+
+
 	else:
-		isWatching=False
+		if (isWathcing):
+			isWatching=False
+			for i in range(5000):
+				sim_node[i].setVisible(False)
+			for com in range(1,78):
+				labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					for crime in range(1,11):
+						if n.isVisible() and n.getChildByIndex(crime).isVisible():
+							n.getChildByIndex(crime).setChildrenVisible(True)
+			isPlaying=0
+			sim_minute=0
+			timer.setVisible(False)
+			sim_at_line=0
 
+## play
 def clickPlayButton():
-	isPlaying=2
+	global isPlaying
 
+	isPlaying=2
+	print 'clicked playButton'
+
+## pause and stop
 def clickPauseButton():
+	global isPlaying
+
 	if isPlaying!=0:
 		isPlaying-=1
 	if isPlaying==0:
+		sim_minute = 0
+		timer.setText('01-01 00:00')
+		for i in range(5000):
+			sim_node[i].setVisible(False)
 
+## update scene
+def updateSim():
+	global sim_node
+	global sim_node_min
+	global sim_minute
+	global sim_at_line
+
+	print ('updating Sim Scene')
+
+	mon = 0
+	day = 0
+	t = sim_minute
+	m = t%60
+	t = t/60
+	h = t%24
+	t = t/24
+	if t<31: #Jan
+		mon = 1
+		day = t+1
+	elif t<59: #Feb
+		mon = 2
+		day = t-30
+	elif t<90: #Mar
+		mon = 3
+		day = t-58
+	elif t<120: #Apr
+		mon = 4
+		day = t-89
+	elif t<151: #May
+		mon = 5
+		day = t-119
+	elif t<181: #Jun
+		mon = 6
+		day = t-150
+	elif t<212: #Jul
+		mon = 7
+		day = t-180
+	elif t<243: #Aug
+		mon = 8
+		day = t-211
+	elif t<273: #Sep
+		mon = 9
+		day = t-242
+	elif t<304: #Oct
+		mon = 10
+		day=t-272
+	elif t<334: #Nov
+		mon=11
+		day=t-303
+	else:
+		mon=12
+		day=t-333
+
+	nowT = ''
+	if (mon>=10):
+		nowT+=str(mon)
+	else:
+		nowT+='0'+str(mon)
+	if (day>=10):
+		nowT+='-'+str(day)
+	else:
+		nowT+='-0'+str(day)
+	if (h>=10):
+		nowT+=' '+str(h)
+	else:
+		nowT+=' 0'+str(h)
+	if (m>=10):
+		nowT+=':'+str(m)
+	else:
+		nowT+=':0'+str(m)
+	timer.setText(nowT)
+
+	while (sim_node_min[sim_at_line]<=sim_minute):
+		sim_node[sim_at_line].setVisible(True)
+		sim_at_line +=1
 
 ##############################################################################################################
 # HOW TO GO TO A COMMUNITY
@@ -787,7 +941,7 @@ nodeTrainParent = SceneNode.create("allTrain")
 all.addChild(nodeTrainParent)
 
 def getTrainInfo():
-	print ("updating...")
+	print ("train updating...")
 	train_xml = urllib2.urlopen('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=484807ed614d4ffb8f31bab10357ba4f&rt=red,blue,brn,g,org,p,pink,y').read()
 	root = ET.fromstring(train_xml)
 
@@ -814,7 +968,7 @@ def getTrainInfo():
 			#model.yaw()
 			model.setEffect('colored -d white')
 			nodeTrainParent.addChild(model)
-	print ("updated!")
+	print ("train updated!")
 
 ##############################################################################################################
 # VICE CITY
@@ -868,6 +1022,8 @@ for items in lines:
 	comm[crime_comm].numCrime[crime_year-2000][crimeType[crime_type]]+=1
  	if crime_year==2013:
  		comm[crime_comm].numCrimeShown+=1
+ 	else:
+ 		crimeIcon.setVisible(False)
 f.close()
 
 ##############################################################################################################
@@ -925,18 +1081,6 @@ def playBGM():
 	#sd.play()
 
 ##############################################################################################################
-# TO DO: LEGEND
-uim = UiModule.createAndInitialize()
-wf = uim.getWidgetFactory()
-ui = uim.getUi()
-
-legend = wf.createImage("legend", ui)
-legend.setData(loadImage('icon/1.png'))
-legend.setLayer(WidgetLayer.Front)
-#legend.setSize(Vector2(200,200))
-legend.setPosition(Vector2(854,480)-legend.getSize())
-
-##############################################################################################################
 # EVENT AND UPDATE FUNCTIONS
 
 isButton7down = False
@@ -984,7 +1128,6 @@ def onEvent():
 		playBtnDownSound(e)
 		if isWatching:
 			clickPlayButton()
-
 
 	elif (e.isButtonUp(EventFlags.Button2)):
 		playBtnUpSound(e)
@@ -1035,6 +1178,7 @@ def onEvent():
 trainDeltaT = 0
 bgmDeltaT = 0
 labelCommDeltaT = 0
+SimDeltaT = 0
 #getTrainInfo()
 #playBGM()
 
@@ -1043,13 +1187,15 @@ def onUpdate(frame, t, dt):
 	global trainDeltaT
 	global bgmDeltaT
 	global labelCommDeltaT
+	global SimDeltaT
+	global isPlaying
+	global sim_minute
+	global sim_at_line
 
 	if frame==5:
-		print 'start interp'
 		interp.setTargetPosition(Vector3(193124.87, -4767697.65, 4228566.18))
 		interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 		interp.startInterpolation()
-		print 'start interp'
 
 	d = cam.getPosition()
 	d0 = float(d.x)
@@ -1065,10 +1211,23 @@ def onUpdate(frame, t, dt):
 		#trainDeltaT = t
 		#getTrainInfo()
 
-	if (t-bgmDeltaT>=86):
-		print "replaying bgm"
-		bgmDeltaT = t
-		#playBGM()
+	if (isPlaying==2):
+		print'isPlaying==2'
+		if (t-SimDeltaT>0.1):
+			print 'need update'
+			SimDeltaT=t
+			sim_minute+=1
+			updateSim()
+
+		# if finished
+		#if sim_minute==525600: whole year
+		if sim_minute>44200: # 5000th node's minute is 44160
+			isPlaying=0
+			SimDeltaT=0
+			sim_minute=0
+			sim_at_line = 0
+	elif isPlaying==0:
+		SimDeltaT = 0
 
 	if (t-labelCommDeltaT>1):
 		labelCommDeltaT = t
@@ -1076,8 +1235,13 @@ def onUpdate(frame, t, dt):
 			caveutil.orientWithHead(cam, labelComm[i])
 		#if needUpdateHour or needUpdateSeason or needUpdateDay:
 		if needUpdateHDS:
-			print ('needUpdateHDS is True, start do it again')
 			clickMoreInfo()
+
+	# replay bgm
+	if (t-bgmDeltaT>=86):
+		print "replaying bgm"
+		bgmDeltaT = t
+		#playBGM()
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
