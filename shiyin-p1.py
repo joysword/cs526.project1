@@ -42,13 +42,14 @@ def llh2ecef(lat, lon, alt):
 
 crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'CRIMINAL DAMAGE':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
 
+##############################################################################################################
 # INITIALIZE THE SCENE
 scene = getSceneManager()
 scene.setBackgroundColor(Color(0, 0, 0, 1))
 env = getSoundEnvironment()
 all = SceneNode.create("everything")
 
-# create a directional light
+## create a directional light
 light1 = Light.create()
 light1.setLightType(LightType.Directional)
 light1.setLightDirection(Vector3(-1.0, -1.0, -1.0))
@@ -56,7 +57,7 @@ light1.setColor(Color(0.7, 0.7, 0.7, 1.0))
 light1.setAmbient(Color(0.5, 0.5, 0.5, 1.0))
 light1.setEnabled(True)
 
-# load some earth models
+## load some earth models
 torusModel1 = ModelInfo()
 torusModel2 = ModelInfo()
 torusModel3 = ModelInfo()
@@ -85,17 +86,18 @@ if caveutil.isCAVE():
 	torusModel4.path = "yahoo_maps.earth"
 	#laptop: crash during running / it works (without showing anything)
 	#cave: works (too low no data)
-
 else:
 	torusModel1.path = "simple.earth"
 	torusModel2.path = "simple.earth"
+	torusModel3.path = "simple.earth"
+	torusModel4.path = "simple.earth"
 
 scene.loadModel(torusModel1)
 scene.loadModel(torusModel2)
 scene.loadModel(torusModel3)
 scene.loadModel(torusModel4)
 
-# create scene objects using the loaded models
+## create scene objects using the loaded models
 torus1 = StaticObject.create("earth")
 torus1.getMaterial().setLit(False)
 all.addChild(torus1)
@@ -115,12 +117,12 @@ torus4.getMaterial().setLit(False)
 all.addChild(torus3)
 torus4.setVisible(False)
 
-# paths for crime sprites
+## paths for crime sprites
 spritePath = [None]*11
 for i in range(1,11):
 	spritePath[i] = "icon/"+str(i)+".png"
 
-# create crime models
+## create crime models
 spriteSize = sprite.createSizeUniform()
 #spriteSize.setFloat(0.1)
 spriteWindowSize = sprite.createWindowSizeUniform()
@@ -129,36 +131,24 @@ spriteWindowSize = sprite.createWindowSizeUniform()
 #else:
 spriteWindowSize.setVector2f(Vector2(854, 480))
 
-# get the camera
+## get the camera
 cam = getDefaultCamera()
 setNearFarZ(1, 20 * r_a)
+cam.setPosition(-wgs84_a*4,0,0)
 
-# set the camera by hand
-cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
-cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-
-# set a fast speed for travel by default
+## set a fast speed for travel by default
 cam.getController().setSpeed(10000)
 
-# set interpolation animation
+## set interpolation animation
 interp = InterpolActor(cam)
 interp.setTransitionType(InterpolActor.SMOOTH)
-interp.setDuration(3)
+interp.setDuration(5)
 interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
 
-## HOW TO GO TO A COMMUNITY
-def goCommunities(x):
-	print "going to %s at (%f,%f)" %(comm[x].name, comm[x].lat, comm[x].lon)
-	newLat = comm[x].lat-5/110.94 # 1 lat is 110940 meters, we want 3km south to the particular point
-	newLon = comm[x].lon
-	newPos = llh2ecef(newLat, newLon, 3000) # 5000 meters high
+## toggleStereo
+toggleStereo()
 
-	interp.setTargetPosition(newPos)
-	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-	interp.startInterpolation()
-	playMovingSound()
-	# TO DO show data of this community
-
+## create communities
 class community:
 	name = ''
 	lat = 0
@@ -256,7 +246,8 @@ comm[53] = community("West Pullman", 41.68, -87.63)
 comm[54] = community("Riverdale", 41.66, -87.61)
 comm[55] = community("Hegewisch", 41.66, -87.55)
 
-# SHOW CRIME AS HOUR/DAY/SEASON
+##############################################################################################################
+# HOW TO FILTER CRIME TYPES AND YEARS AND MORE
 nodeHDSParent = SceneNode.create('nodeHDSParent')
 
 all.addChild(nodeHDSParent)
@@ -268,8 +259,6 @@ for i in range(1,78):
 		nodeHDS[i][j] = BoxShape.create(200,1000,200)
 		nodeHDSParent.addChild(nodeHDS[i][j])
 nodeHDSParent.setChildrenVisible(False)
-
-# HOW TO FILTER CRIME TYPES AND YEARS AND MORE
 
 notCrime = set()
 notYear = set()
@@ -507,6 +496,43 @@ def clickMoreInfo():
 					nodeHDS[com][i].setVisible(True)
 
 ##############################################################################################################
+# SIMULATION FUNCTIONS
+isWatching = False
+isPlaying = 0
+sim_atDate
+
+def IOWatchMode(x):
+	global isWatching
+	global isPlaying
+	if x==1:
+		isWatching=True
+	else:
+		isWatching=False
+
+def clickPlayButton():
+	isPlaying=2
+
+def clickPauseButton():
+	if isPlaying!=0:
+		isPlaying-=1
+	if isPlaying==0:
+
+
+##############################################################################################################
+# HOW TO GO TO A COMMUNITY
+def goCommunities(x):
+	print "going to %s at (%f,%f)" %(comm[x].name, comm[x].lat, comm[x].lon)
+	newLat = comm[x].lat-5/110.94 # 1 lat is 110940 meters, we want 3km south to the particular point
+	newLon = comm[x].lon
+	newPos = llh2ecef(newLat, newLon, 3000) # 5000 meters high
+
+	interp.setDuration(3)
+	interp.setTargetPosition(newPos)
+	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+	interp.startInterpolation()
+	playMovingSound()
+
+##############################################################################################################
 # CREATE MENUS
 mm = MenuManager.createAndInitialize()
 menu0_chicago = mm.getMainMenu().addSubMenu("Chicago Panel")
@@ -680,11 +706,15 @@ btn_season.setText('season of year')
 
 menu1_4simu = menu0_chicago.addSubMenu("REAL TIME WATCH")
 cc = menu1_4simu.getContainer()
-label_simu = Label.create(cc)
-label_simu.setText("TEST SIMULATION")
-# TO DO simulation
-
-# CTA stops
+btn_play = Button.create(cc)
+btn_stop = Button.create(cc)
+btn_play.setText('enter watch mode')
+btn_stop.setText('quit watch mode')
+btn_play.setUIEventCommand('IOWatchMode(1)')
+btn_stop.setUIEventCommand('IOWatchMode(0)')
+##############################################################################################################
+# CTA RELATED
+## CTA stops
 f = open('CHICAGO_DATA/cta_L_stops/cta_L_stops_final.csv', 'rb')
 ctastops = csv.reader(f)
 for stop in ctastops:
@@ -712,7 +742,7 @@ for stop in ctastops:
 	all.addChild(text)
 f.close()
 
-# CTA lines
+## CTA lines
 f = open('CHICAGO_DATA/CTARailLines.csv','rb')
 ctaLines = csv.reader(f)
 for seg in ctaLines:
@@ -752,7 +782,7 @@ for seg in ctaLines:
 	all.addChild(xLine)
 f.close()
 
-# GET TRAIN LOCATION FROM CTA
+## GET TRAIN LOCATION FROM CTA
 nodeTrainParent = SceneNode.create("allTrain")
 all.addChild(nodeTrainParent)
 
@@ -786,9 +816,8 @@ def getTrainInfo():
 			nodeTrainParent.addChild(model)
 	print ("updated!")
 
+##############################################################################################################
 # VICE CITY
-#viceCity="""
-
 nodeComm = [None]*78
 nodeYear = [None]*14
 nodeCrime = [None]*11
@@ -841,19 +870,15 @@ for items in lines:
  		comm[crime_comm].numCrimeShown+=1
 f.close()
 
-for k in range(1,11):
-	print "loop's # of crime in 2013 [%d] = %d" %(k,comm[32].numCrime[13][k])
-
-print "comm[32].numCrimeShown:",comm[32].numCrimeShown
-
+##############################################################################################################
+# COMMUNITY LABELS
 labelComm = [None]*78
 
-# COMMUNITY LABELS
 for i in range(1,78):
 	if caveutil.isCAVE():
 		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 200, comm[i].name+' ('+str(comm[i].numCrimeShown)+')')
 	else:
-		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 20, comm[i].name+' ('+str(comm[i].numCrimeShown)+')') # TO DO : change the value
+		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 20, comm[i].name+' ('+str(comm[i].numCrimeShown)+')')
 
 	posComm = llh2ecef(comm[i].lat, comm[i].lon, 300.0)
 	labelComm[i].setPosition(posComm)
@@ -862,8 +887,6 @@ for i in range(1,78):
 	caveutil.orientWithHead(cam, labelComm[i])
 	all.addChild(labelComm[i])
 
-toggleStereo()
-
 # TEST FACE CAMERA
 #testObject = PlaneShape.create(20, 20)
 #testObject.setEffect("colored -d red")
@@ -871,16 +894,8 @@ toggleStereo()
 #caveutil.positionAtHead(cam, testObject, 2)
 #caveutil.orientWithHead(cam, testObject)
 
-r = 0
-r2 = 0
-
-#handle events from the wand
-# left button toggle between two maps
-
-isButton7down = False
-wandOldPos = Vector3()
-wandOldOri = Quaternion()
-
+##############################################################################################################
+# SOUND FUNCTIONS
 def playBtnDownSound(e):
 	print ('button down')
 	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/menu/down.wav"))
@@ -895,7 +910,6 @@ def playBtnUpSound(e):
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
-
 def playMovingSound():
 	print ('on the move')
 	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/move.wav"))
@@ -903,7 +917,6 @@ def playMovingSound():
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
-
 def playBGM():
 	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.wav"))
 	sd.setPosition( cam.getPosition() )
@@ -911,6 +924,7 @@ def playBGM():
 	sd.setWidth(20)
 	#sd.play()
 
+##############################################################################################################
 # TO DO: LEGEND
 uim = UiModule.createAndInitialize()
 wf = uim.getWidgetFactory()
@@ -922,10 +936,19 @@ legend.setLayer(WidgetLayer.Front)
 #legend.setSize(Vector2(200,200))
 legend.setPosition(Vector2(854,480)-legend.getSize())
 
+##############################################################################################################
+# EVENT AND UPDATE FUNCTIONS
+
+isButton7down = False
+wandOldPos = Vector3()
+wandOldOri = Quaternion()
+
+## event
 def onEvent():
-	global userScaleFactor
 	global isButton7down
 	global wandOldPos
+	global wandOldOri
+	global isWatching
 
 	e = getEvent()
 
@@ -959,18 +982,23 @@ def onEvent():
 
 	elif (e.isButtonDown(EventFlags.Button2)):
 		playBtnDownSound(e)
+		if isWatching:
+			clickPlayButton()
+
 
 	elif (e.isButtonUp(EventFlags.Button2)):
 		playBtnUpSound(e)
 
 	elif (e.isButtonDown(EventFlags.Button3)):
 		playBtnDownSound(e)
+		if isWatching:
+			clickPauseButton()
 
 	elif (e.isButtonUp(EventFlags.Button3)):
 		playBtnUpSound(e)
 
-	elif (e.getType()==EventType.Update) and (isButton7down):
-		e.getAxis(0)
+	#elif (e.getType()==EventType.Update) and (isButton7down):
+	#	e.getAxis(0)
 
 	elif e.isKeyDown(ord('j')): # left
 		#cam.setPosition( cam.convertLocalToWorldPosition( Vector3(-1,0,0)*100 ) )
@@ -1010,10 +1038,18 @@ labelCommDeltaT = 0
 #getTrainInfo()
 #playBGM()
 
+## update
 def onUpdate(frame, t, dt):
 	global trainDeltaT
 	global bgmDeltaT
 	global labelCommDeltaT
+
+	if frame==5:
+		print 'start interp'
+		interp.setTargetPosition(Vector3(193124.87, -4767697.65, 4228566.18))
+		interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+		interp.startInterpolation()
+		print 'start interp'
 
 	d = cam.getPosition()
 	d0 = float(d.x)
@@ -1046,7 +1082,8 @@ def onUpdate(frame, t, dt):
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
 
-
+##############################################################################################################
+# DEVELOPMENT USE ONLY
 never ="""
 												!!!KIDNAPPING : 165 (ICON USING OTHERS)
 		INTERFERE WITH PUBLIC OFFICER : 0
