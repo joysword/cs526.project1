@@ -21,7 +21,7 @@ seawrite = csv.writer(ressea)
 crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'CRIMINAL DAMAGE':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
 
 hour=[[[[0]*4 for crime in range(11)] for year in range(14)] for comm in range(78)]
-weekday=[[[[0]*8 for crime in range(11)] for year in range(14)] for comm in range(78)]
+weekday=[[[[0]*7 for crime in range(11)] for year in range(14)] for comm in range(78)]
 season=[[[[0]*4 for crime in range(11)] for year in range(14)] for comm in range(78)]
 
 #comm year type
@@ -77,7 +77,9 @@ for comm in range(1,78):
 	for year in range(1,14):
 		for crime in range(1,11):
 			houwrite.writerow( (comm,year+2000,crime,hour[comm][year][crime][0],hour[comm][year][crime][1],hour[comm][year][crime][2],hour[comm][year][crime][3]) )
-			weewrite.writerow( (comm,year+2000,crime,weekday[comm][year][crime][1]) )
-			seawrite.writerow( (comm,year+2000,crime,eason[comm][year][crime]) )
+			weewrite.writerow( (comm,year+2000,crime,weekday[comm][year][crime][0],weekday[comm][year][crime][1],weekday[comm][year][crime][2],weekday[comm][year][crime][3],weekday[comm][year][crime][4],weekday[comm][year][crime][5],weekday[comm][year][crime][6]) )
+			seawrite.writerow( (comm,year+2000,crime,season[comm][year][crime][0],season[comm][year][crime][1],season[comm][year][crime][2],season[comm][year][crime][3]) )
 
-res.close()
+ressea.close()
+reswee.close()
+reshou.close()

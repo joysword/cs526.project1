@@ -31,13 +31,13 @@ wgs84_b2 = wgs84_b**2
 def llh2ecef(lat, lon, alt):
 	lat *= (math.pi / 180.0)
 	lon *= (math.pi / 180.0)
-	
+
 	n = lambda x: wgs84_a / math.sqrt(1 - wgs84_e2*(math.sin(x)**2))
-	
+
 	x = (n(lat) + alt)*math.cos(lat)*math.cos(lon)
 	y = (n(lat) + alt)*math.cos(lat)*math.sin(lon)
 	z = (n(lat)*(1-wgs84_e2)+alt)*math.sin(lat)
-	
+
 	return Vector3(x,y,z)
 
 crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'CRIMINAL DAMAGE':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
@@ -153,16 +153,6 @@ def clickYear(year):
 					else:
 						nodeComm[com].setVisible(False)
 
-# SHOW CRIME AS HOUR/DAY/SEASON
-def clickMoreInfo(x):
-	if x==0:
-		print ('nothing')
-	elif x==1:
-		print ('hour of day')
-	elif x==2:
-		print ('day of week')
-	elif x==3:
-		print ('season of year')
 
 class community:
 	name = ''
@@ -171,6 +161,12 @@ class community:
 	pos = Vector3()
 	numCrime = [[0]*11 for i in range(0,14)]
 	numCrimeShown = 0
+	numHour = [0]*4
+	numDay = [0]*7
+	numSeason = [0]*5
+	nodeHour = [[None]*4
+	nodeDay = [[None]*7 for i in range(78)]
+	nodeSeason = [[None]*4 for i in range(78)]
 	def __init__(self, n, x, y):
 		self.name = n
 		self.lat = x
@@ -260,13 +256,68 @@ comm[53] = community("West Pullman", 41.68, -87.63)
 comm[54] = community("Riverdale", 41.66, -87.61)
 comm[55] = community("Hegewisch", 41.66, -87.55)
 
+# SHOW CRIME AS HOUR/DAY/SEASON
+nodeHour = [[None]*4 for i in range(78)]
+nodeDay = [[None]*7 for i in range(78)]
+nodeSeason = [[None]*4 for i in range(78)]
+for i in range(1,78):
+	nodeHour =
+
+## click the button
+def clickMoreInfo(x):
+	if x==0:
+		print ('nothing')
+	elif x==1:
+		numHour = [[0]*4 for i in range(78)]
+		f = open('CrimesAll__hour.csv','rb')
+		csvHourRead = csv.reader(f)
+		for line in csvHourRead:
+			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+				com = int(line[0])
+				numHour[com][0]+=int(line[3])
+				numHour[com][1]+=int(line[4])
+				numHour[com][2]+=int(line[5])
+				numHour[com][3]+=int(line[6])
+		f.close()
+
+		# TO DO: draw
+	elif x==2:
+		numDay = [[0]*7 for i in range(78)]
+		f = open('CrimesAll__day.csv','rb')
+		csvDayRead = csv.reader(f)
+		for line in csvDayRead:
+			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+				com = int(line[0])
+				numDay[com][0]+=int(line[3])
+				numDay[com][1]+=int(line[4])
+				numDay[com][2]+=int(line[5])
+				numDay[com][3]+=int(line[6])
+				numDay[com][4]+=int(line[7])
+				numDay[com][5]+=int(line[8])
+				numDay[com][6]+=int(line[9])
+		f.close()
+		# TO DO: draw
+	elif x==3:
+		numSeason = [[0]*4 for i in range(78)]
+		f = open('CrimesAll__season.csv','rb')
+		csvSeasonRead = csv.reader(f)
+		for line in csvSeasonRead:
+			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+				com = int(line[0])
+				numSeason[com][0]+=int(line[3])
+				numSeason[com][1]+=int(line[4])
+				numSeason[com][2]+=int(line[5])
+				numSeason[com][3]+=int(line[6])
+		f.close()
+		# TO DO: draw
+
 ##############################################################################################################
 # CREATE MENUS
 mm = MenuManager.createAndInitialize()
 menu0_chicago = mm.getMainMenu().addSubMenu("Chicago Panel")
 
 menu1_0_comm = menu0_chicago.addSubMenu("WATCH A COMMUNITY")
- 
+
 menu1_0_1 = menu1_0_comm.addSubMenu("Far North Side")
 menu1_0_2 = menu1_0_comm.addSubMenu("Northwest Side")
 menu1_0_3 = menu1_0_comm.addSubMenu("North Side")
@@ -482,7 +533,7 @@ if caveutil.isCAVE():
 	torusModel3.path = "yahoo_aerial.earth"
 	#laptop: it works (without showing anything)
 	#cave: works (too low no data)
-	
+
 	torusModel4.path = "yahoo_maps.earth"
 	#laptop: crash during running / it works (without showing anything)
 	#cave: works (too low no data)
@@ -521,7 +572,7 @@ spriteSize = sprite.createSizeUniform()
 #spriteSize.setFloat(0.1)
 spriteWindowSize = sprite.createWindowSizeUniform()
 spriteWindowSize = None
-#if caveutil.isCAVE:
+#if caveutil.isCAVE():
 #	spriteWindowSize.setVector2f(Vector2(10000, 1000))
 #else:
 #	spriteWindowSize.setVector2f(Vector2(854, 480))
@@ -553,15 +604,18 @@ for stop in ctastops:
 	model.setEffect('colored -d white')
 
 	text = Text3D.create('font/helvetica.ttf', 100, stop[2])
-	if caveutil.isCAVE==False:
-		text = Text3D.create('font/helvetica.ttf', 10, stop[2])
+	if caveutil.isCAVE()==False:
+		text = Text3D.create('font/helvetica.ttf', 15, stop[2])
 	caveutil.orientWithHead(cam, text)
 	text.roll(math.pi/4*0.75)
 
 	posText = llh2ecef(float(stop[1]), float(stop[0]), 100.0)
 	text.setPosition(posText)
 	text.setFixedSize(True)
-	text.setColor(Color('black'))
+	if caveutil.isCAVE():
+		text.setColor(Color('black'))
+	else:
+		text.setColor(Color('white'))
 
 	all.addChild(model)
 	all.addChild(text)
@@ -619,13 +673,13 @@ def getTrainInfo():
 	num = nodeTrainParent.numChildren()
 	for i in range(0,num):
 		nodeTrainParent.removeChildByIndex(0)
-	
+
 	for route in root:
 		for train in route:
 			lat = float(train.find('lat').text)
 			lon = float(train.find('lon').text)
 			heading = float(train.find('heading').text)
-			
+
 			pos = llh2ecef(lat, lon, 70)
 			model = BoxShape.create(50,40,300)
 			#model.setBoundingBoxVisible(True)
@@ -684,7 +738,7 @@ for items in lines:
 	#crime_year = 2013
 	#crime_lat = float(items[5])
 	#crime_lon = float(items[6])
-	
+
 	pos = llh2ecef(crime_lat, crime_lon, 100.0)
 
 	crimeIcon = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
@@ -705,10 +759,10 @@ labelComm = [None]*78
 
 # COMMUNITY LABELS
 for i in range(1,78):
-	if caveutil.isCAVE:
+	if caveutil.isCAVE():
 		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 200, comm[i].name+' ('+str(comm[i].numCrimeShown)+')')
 	else:
-		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 10, comm[i].name+' ('+str(comm[i].numCrimeShown)+')') # TO DO : change the value
+		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 20, comm[i].name+' ('+str(comm[i].numCrimeShown)+')') # TO DO : change the value
 
 	posComm = llh2ecef(comm[i].lat, comm[i].lon, 300.0)
 	labelComm[i].setPosition(posComm)
@@ -823,7 +877,7 @@ def onEvent():
 
 	elif (e.isButtonUp(EventFlags.Button3)):
 		playBtnUpSound(e)
-	
+
 	elif (e.getType()==EventType.Update) and (isButton7down):
 		e.getAxis(0)
 
