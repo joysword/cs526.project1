@@ -42,6 +42,111 @@ def llh2ecef(lat, lon, alt):
 
 crimeType = {'ALL':0, 'HOMICIDE':1, 'KIDNAPPING':2, 'ROBBERY':3, 'BURGLARY':4, 'MOTOR VEHICLE THEFT':5, 'CRIMINAL DAMAGE':6, 'ARSON':7, 'THEFT':8, 'ASSAULT':9, 'CRIM SEXUAL ASSAULT':10}
 
+# INITIALIZE THE SCENE
+scene = getSceneManager()
+scene.setBackgroundColor(Color(0, 0, 0, 1))
+env = getSoundEnvironment()
+all = SceneNode.create("everything")
+
+# create a directional light
+light1 = Light.create()
+light1.setLightType(LightType.Directional)
+light1.setLightDirection(Vector3(-1.0, -1.0, -1.0))
+light1.setColor(Color(0.7, 0.7, 0.7, 1.0))
+light1.setAmbient(Color(0.5, 0.5, 0.5, 1.0))
+light1.setEnabled(True)
+
+# load some earth models
+torusModel1 = ModelInfo()
+torusModel2 = ModelInfo()
+torusModel3 = ModelInfo()
+torusModel4 = ModelInfo()
+
+torusModel1.name = "earth"
+torusModel2.name = "map"
+torusModel3.name = 'yahoo_earth'
+torusModel4.name = 'yahoo_map'
+
+if caveutil.isCAVE():
+	torusModel2.path = "openstreetmap.earth"
+	#torusModel2.path = "simple.earth"
+	#laptop: crash when start
+	#cave: it works!
+
+	torusModel1.path = "mapquestaerial.earth"
+	#torusModel.path = "simple.earth"
+	#laptop: crash when start
+	#cave: it works!
+
+	torusModel3.path = "yahoo_aerial.earth"
+	#laptop: it works (without showing anything)
+	#cave: works (too low no data)
+
+	torusModel4.path = "yahoo_maps.earth"
+	#laptop: crash during running / it works (without showing anything)
+	#cave: works (too low no data)
+
+else:
+	torusModel1.path = "simple.earth"
+	torusModel2.path = "simple.earth"
+
+scene.loadModel(torusModel1)
+scene.loadModel(torusModel2)
+scene.loadModel(torusModel3)
+scene.loadModel(torusModel4)
+
+# create scene objects using the loaded models
+torus1 = StaticObject.create("earth")
+torus1.getMaterial().setLit(False)
+all.addChild(torus1)
+
+torus2 = StaticObject.create("map")
+torus2.getMaterial().setLit(False)
+all.addChild(torus2)
+torus2.setVisible(False)
+
+torus3 = StaticObject.create("yahoo_earth")
+torus3.getMaterial().setLit(False)
+all.addChild(torus3)
+torus3.setVisible(False)
+
+torus4 = StaticObject.create("yahoo_map")
+torus4.getMaterial().setLit(False)
+all.addChild(torus3)
+torus4.setVisible(False)
+
+# paths for crime sprites
+spritePath = [None]*11
+for i in range(1,11):
+	spritePath[i] = "icon/"+str(i)+".png"
+
+# create crime models
+spriteSize = sprite.createSizeUniform()
+#spriteSize.setFloat(0.1)
+spriteWindowSize = sprite.createWindowSizeUniform()
+spriteWindowSize = None
+#if caveutil.isCAVE():
+#	spriteWindowSize.setVector2f(Vector2(10000, 1000))
+#else:
+#	spriteWindowSize.setVector2f(Vector2(854, 480))
+
+# get the camera
+cam = getDefaultCamera()
+setNearFarZ(1, 20 * r_a)
+
+# set the camera by hand
+cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
+cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+
+# set a fast speed for travel by default
+cam.getController().setSpeed(10000)
+
+# set interpolation animation
+interp = InterpolActor(cam)
+interp.setTransitionType(InterpolActor.SMOOTH)
+interp.setDuration(3)
+interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
+
 ## HOW TO GO TO A COMMUNITY
 def goCommunities(x):
 	print "going to %s at (%f,%f)" %(comm[x].name, comm[x].lat, comm[x].lon)
@@ -55,105 +160,6 @@ def goCommunities(x):
 	playMovingSound()
 	# TO DO show data of this community
 
-# HOW TO FILTER CRIME TYPES AND YEARS
-
-notCrime = set()
-notYear = set()
-notCom = set()
-
-## CLICK CRIME TYPE FILTER BUTTONS
-def clickCrime(crime):
-	if crime==0:
-		if btnCrime[0].isChecked(): # if we want to show all
-			notCrime.clear()
-			for j in range(1,11):
-				if btnCrime[j].isChecked()==False:
-					notCrime.add(j) # collect all crimes currently not checked
-					btnCrime[j].setChecked(True)
-					clickCrime(j)
-		else: # if we want to quit show all
-			for j in notCrime:
-				btnCrime[j].setChecked(False)
-				clickCrime(j)
-	else: # individual crime type
-		if btnCrime[crime].isChecked(): # if we want to check this crime
-			for com in range(1,78):
-				for year in range(1,14):
-					n = nodeComm[com].getChildByIndex(year)
-					n.getChildByIndex(crime).setVisible(True)
-					if n.isVisible(): # if this year is visible, toggle crime drawables
-						n.getChildByIndex(crime).setChildrenVisible(True)
-						if (com==32):
-							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
-						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
-						if (com==32):
-							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-		else: # if we want to uncheck this crime
-			if btnCrime[0].isChecked(): # nothing happens
-				btnCrime[crime].setChecked(True)
-				return 0
-			for com in range(1,78):
-				for year in range(1,14):
-					n = nodeComm[com].getChildByIndex(year)
-					n.getChildByIndex(crime).setVisible(False)
-					if n.isVisible(): # if this year is visible, toggle crime drawables
-						n.getChildByIndex(crime).setChildrenVisible(False)
-						if (com==32):
-							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
-						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
-						if (com==32):
-							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-
-## CLICK YEAR FILTER BUTTONS
-def clickYear(year):
-	if year==0:
-		if btnYear[0].isChecked(): # if we want to show all
-			notYear.clear()
-			for j in range(1,14):
-				if btnYear[j].isChecked()==False:
-					notYear.add(j) # collect all years currently not checked
-					btnYear[j].setChecked(True)
-					clickYear(j)
-		else: # if we want to quit show all
-			for j in notYear:
-				btnYear[j].setChecked(False)
-				clickYear(j)
-	else: # individual year
-		if btnYear[year].isChecked(): # if we want to check this year
-			for com in range(1,78):
-				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year)
-					n.setVisible(True)
-					if n.getChildByIndex(crime).isVisible(): # if this crime is visible, toggle crime drawables
-						n.getChildByIndex(crime).setChildrenVisible(True)
-						if (com==32):
-							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
-						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
-						if (com==32):
-							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-		else: # if we want to uncheck this year
-			if btnYear[0].isChecked(): # nothing happens
-				btnCrime[year].setChecked(True)
-				return 0
-			for com in range(1,78):
-				for crime in range(1,11):
-					n = nodeComm[com].getChildByIndex(year)
-					n.setVisible(False)
-					if n.getChildByIndex(crime).isVisible(): # if this crime is visible, toggle crime drawables
-						n.getChildByIndex(crime).setChildrenVisible(False)
-						if (com==32):
-							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
-						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
-						if (com==32):
-							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
-						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
-					else:
-						nodeComm[com].setVisible(False)
-
-
 class community:
 	name = ''
 	lat = 0
@@ -164,9 +170,6 @@ class community:
 	numHour = [0]*4
 	numDay = [0]*7
 	numSeason = [0]*5
-	nodeHour = [[None]*4
-	nodeDay = [[None]*7 for i in range(78)]
-	nodeSeason = [[None]*4 for i in range(78)]
 	def __init__(self, n, x, y):
 		self.name = n
 		self.lat = x
@@ -174,10 +177,8 @@ class community:
 		self.pos = llh2ecef(x,y,0)
 		self.numCrimeShown = 0
 		self.numCrime = [[0]*11 for xx in range(0,14)]
-	def watchme(self):
-		print ("watching community %s" %(self.name))
 
-comm = [None]*100
+comm = [None]*78
 comm[1] = community("Rogers Park", 42.01, -87.67)
 comm[2] = community("West Ridge", 42, -87.69)
 comm[3] = community("Uptown", 41.97, -87.66)
@@ -257,59 +258,284 @@ comm[54] = community("Riverdale", 41.66, -87.61)
 comm[55] = community("Hegewisch", 41.66, -87.55)
 
 # SHOW CRIME AS HOUR/DAY/SEASON
+nodeHourParent = SceneNode.create('nodeHourParent')
+nodeDayParent = SceneNode.create('nodeDayParent')
+nodeSeasonParent = SceneNode.create('nodeSeasonParent')
+
+all.addChild(nodeHourParent)
+all.addChild(nodeDayParent)
+all.addChild(nodeSeasonParent)
+
 nodeHour = [[None]*4 for i in range(78)]
 nodeDay = [[None]*7 for i in range(78)]
 nodeSeason = [[None]*4 for i in range(78)]
+
 for i in range(1,78):
-	nodeHour =
+	for j in range(4):
+		nodeHour[i][j] = SceneNode.create('nodeHour'+str(i)+'_'+str(j))
+		nodeSeason[i][j] = SceneNode.create('nodeSeason'+str(i)+'_'+str(j))
+		nodeHourParent.addChild(nodeHour[i][j])
+		nodeSeasonParent.addChild(nodeSeason[i][j])
+	for j in range(7):
+		nodeDay[i][j] = SceneNode.create('nodeDay'+str(i)+'_'+str(j))
+		nodeDayParent.addChild(nodeDay[i][j])
 
-## click the button
-def clickMoreInfo(x):
-	if x==0:
-		print ('nothing')
-	elif x==1:
-		numHour = [[0]*4 for i in range(78)]
-		f = open('CrimesAll__hour.csv','rb')
-		csvHourRead = csv.reader(f)
-		for line in csvHourRead:
-			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
-				com = int(line[0])
-				numHour[com][0]+=int(line[3])
-				numHour[com][1]+=int(line[4])
-				numHour[com][2]+=int(line[5])
-				numHour[com][3]+=int(line[6])
-		f.close()
+# HOW TO FILTER CRIME TYPES AND YEARS AND MORE
 
-		# TO DO: draw
-	elif x==2:
-		numDay = [[0]*7 for i in range(78)]
-		f = open('CrimesAll__day.csv','rb')
-		csvDayRead = csv.reader(f)
-		for line in csvDayRead:
-			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
-				com = int(line[0])
-				numDay[com][0]+=int(line[3])
-				numDay[com][1]+=int(line[4])
-				numDay[com][2]+=int(line[5])
-				numDay[com][3]+=int(line[6])
-				numDay[com][4]+=int(line[7])
-				numDay[com][5]+=int(line[8])
-				numDay[com][6]+=int(line[9])
-		f.close()
-		# TO DO: draw
-	elif x==3:
-		numSeason = [[0]*4 for i in range(78)]
-		f = open('CrimesAll__season.csv','rb')
-		csvSeasonRead = csv.reader(f)
-		for line in csvSeasonRead:
-			if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
-				com = int(line[0])
-				numSeason[com][0]+=int(line[3])
-				numSeason[com][1]+=int(line[4])
-				numSeason[com][2]+=int(line[5])
-				numSeason[com][3]+=int(line[6])
-		f.close()
-		# TO DO: draw
+notCrime = set()
+notYear = set()
+notCom = set()
+needUpdateHour = True
+needUpdateDay = True
+needUpdateSeason = True
+
+## CLICK CRIME TYPE FILTER BUTTONS
+def clickCrime(crime):
+	global needUpdateDay
+	global needUpdateHour
+	global needUpdateSeason
+
+	needUpdateHour = True
+	needUpdateDay = True
+	needUpdateSeason = True
+	if crime==0:
+		if btnCrime[0].isChecked(): # if we want to show all
+			notCrime.clear()
+			for j in range(1,11):
+				if btnCrime[j].isChecked()==False:
+					notCrime.add(j) # collect all crimes currently not checked
+					btnCrime[j].setChecked(True)
+					clickCrime(j)
+		else: # if we want to quit show all
+			for j in notCrime:
+				btnCrime[j].setChecked(False)
+				clickCrime(j)
+	else: # individual crime type
+		if btnCrime[crime].isChecked(): # if we want to check this crime
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					n.getChildByIndex(crime).setVisible(True)
+					if n.isVisible(): # if this year is visible, toggle crime drawables
+						n.getChildByIndex(crime).setChildrenVisible(True)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
+						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+		else: # if we want to uncheck this crime
+			if btnCrime[0].isChecked(): # nothing happens
+				btnCrime[crime].setChecked(True)
+				return 0
+			for com in range(1,78):
+				for year in range(1,14):
+					n = nodeComm[com].getChildByIndex(year)
+					n.getChildByIndex(crime).setVisible(False)
+					if n.isVisible(): # if this year is visible, toggle crime drawables
+						n.getChildByIndex(crime).setChildrenVisible(False)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
+						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+
+## CLICK YEAR FILTER BUTTONS
+def clickYear(year):
+	global needUpdateDay
+	global needUpdateHour
+	global needUpdateSeason
+
+	needUpdateHour = True
+	needUpdateDay = True
+	needUpdateSeason = True
+	if year==0:
+		if btnYear[0].isChecked(): # if we want to show all
+			notYear.clear()
+			for j in range(1,14):
+				if btnYear[j].isChecked()==False:
+					notYear.add(j) # collect all years currently not checked
+					btnYear[j].setChecked(True)
+					clickYear(j)
+		else: # if we want to quit show all
+			for j in notYear:
+				btnYear[j].setChecked(False)
+				clickYear(j)
+	else: # individual year
+		if btnYear[year].isChecked(): # if we want to check this year
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeComm[com].getChildByIndex(year)
+					n.setVisible(True)
+					if n.getChildByIndex(crime).isVisible(): # if this crime is visible, toggle crime drawables
+						n.getChildByIndex(crime).setChildrenVisible(True)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
+						comm[com].numCrimeShown+=comm[com].numCrime[year][crime]
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+		else: # if we want to uncheck this year
+			if btnYear[0].isChecked(): # nothing happens
+				btnCrime[year].setChecked(True)
+				return 0
+			for com in range(1,78):
+				for crime in range(1,11):
+					n = nodeComm[com].getChildByIndex(year)
+					n.setVisible(False)
+					if n.getChildByIndex(crime).isVisible(): # if this crime is visible, toggle crime drawables
+						n.getChildByIndex(crime).setChildrenVisible(False)
+						if (com==32):
+							print "loop's numCrimeShown was: %d" %(comm[com].numCrimeShown)
+						comm[com].numCrimeShown-=comm[com].numCrime[year][crime]
+						if (com==32):
+							print "loop's numCrimeShown is now: %d" %(comm[com].numCrimeShown)
+						labelComm[com].setText(comm[com].name+' ('+str(comm[com].numCrimeShown)+')')
+					else:
+						nodeComm[com].setVisible(False)
+
+## CLICK INFO FILTER BUTTONS
+def clickMoreInfo():
+	global needUpdateDay
+	global needUpdateHour
+	global needUpdateSeason
+
+	if btn_none.isChecked(): # nothing
+		nodeHourParent.setChildrenVisible(False)
+		nodeDayParent.setChildrenVisible(False)
+		nodeSeasonParent.setChildrenVisible(False)
+	elif btn_hour.isChecked(): # hour
+		print ('btn_hour is checked')
+		nodeHourParent.setChildrenVisible(True)
+		nodeDayParent.setChildrenVisible(False)
+		nodeSeasonParent.setChildrenVisible(False)
+		if needUpdateHour:
+			needUpdateHour = False
+			for i in range(1,78):
+				comm[i].numHour = [0]*4
+			f = open('CrimesAll__hour.csv','rb')
+			csvHourRead = csv.reader(f)
+			for line in csvHourRead:
+				if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+					com = int(line[0])
+					comm[com].numHour[0]+=int(line[3])
+					comm[com].numHour[1]+=int(line[4])
+					comm[com].numHour[2]+=int(line[5])
+					comm[com].numHour[3]+=int(line[6])
+			f.close()
+			numHourMax = 0
+			for com in range(1,78):
+				for i in range(4):
+					if comm[com].numHour[i]>numHourMax:
+						numHourMax = comm[com].numHour[i]
+			if (numHourMax!=0):
+				for com in range(1,78):
+					for i in range(4):
+						ratio = (comm[com].numHour[i]+0.0)/(numHourMax+0.0)
+						nodeHour[com][i] = BoxShape.create(150,1000*ratio,150)
+						nodeHour[com][i].setPosition(comm[com].pos)
+						caveutil.orientWithHead(cam,nodeHour[com][i])
+						nodeHour[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
+						if (ratio > 0.8):
+							nodeHour[com][i].setEffect('colored -d #A23333')
+						elif (ratio > 0.6):
+							nodeHour[com][i].setEffect('colored -d #EA6A40')
+						elif (ratio > 0.4):
+							nodeHour[com][i].setEffect('colored -d #DCA53D')
+						elif (ratio > 0.2):
+							nodeHour[com][i].setEffect('colored -d #4F9337')
+						else:
+							nodeHour[com][i].setEffect('colored -d silver')
+	elif btn_day.isChecked(): # day
+		print ('btn_day is checked')
+		nodeHourParent.setChildrenVisible(False)
+		nodeDayParent.setChildrenVisible(True)
+		nodeSeasonParent.setChildrenVisible(False)
+		for i in range(0,nodeHourParent.numChildren()):
+			print "child:",i,nodeHourParent.getChildByIndex(i).isVisible()
+		if needUpdateDay:
+			needUpdateDay = False
+			for i in range(1,78):
+				comm[i].numDay = [0]*7
+			f = open('CrimesAll__day.csv','rb')
+			csvDayRead = csv.reader(f)
+			for line in csvDayRead:
+				if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+					com = int(line[0])
+					comm[com].numDay[0]+=int(line[3])
+					comm[com].numDay[1]+=int(line[4])
+					comm[com].numDay[2]+=int(line[5])
+					comm[com].numDay[3]+=int(line[6])
+					comm[com].numDay[4]+=int(line[7])
+					comm[com].numDay[5]+=int(line[8])
+					comm[com].numDay[6]+=int(line[9])
+			f.close()
+			numDayMax = 0
+			for com in range(1,78):
+				for i in range(7):
+					if comm[com].numDay[i]>numDayMax:
+						numDayMax = comm[com].numDay[i]
+			if (numDayMax!=0):
+				for com in range(1,78):
+					for i in range(7):
+						ratio = (comm[com].numDay[i]+0.0)/(numDayMax+0.0)
+						nodeDay[com][i] = BoxShape.create(150,1000*ratio,150)
+						nodeDay[com][i].setPosition(comm[com].pos)
+						caveutil.orientWithHead(cam,nodeDay[com][i])
+						nodeDay[com][i].translate(200*(i-3),500*ratio+200,0, Space.Local)
+						if (ratio > 0.8):
+							nodeDay[com][i].setEffect('colored -d #A23333')
+						elif (ratio > 0.6):
+							nodeDay[com][i].setEffect('colored -d #EA6A40')
+						elif (ratio > 0.4):
+							nodeDay[com][i].setEffect('colored -d #DCA53D')
+						elif (ratio > 0.2):
+							nodeDay[com][i].setEffect('colored -d #4F9337')
+						else:
+							nodeDay[com][i].setEffect('colored -d silver')
+	elif btn_season.isChecked(): # season
+		print ('btn_season is checked')
+		nodeHourParent.setChildrenVisible(False)
+		nodeDayParent.setChildrenVisible(False)
+		nodeSeasonParent.setChildrenVisible(True)
+		if needUpdateSeason:
+			needUpdateSeason = False
+			for i in range(1,78):
+				comm[i].numSeason = [0]*4
+			f = open('CrimesAll__season.csv','rb')
+			csvSeasonRead = csv.reader(f)
+			for line in csvSeasonRead:
+				if btnYear[int(line[1])-2000].isChecked() and btnCrime[int(line[2])].isChecked():
+					com = int(line[0])
+					comm[com].numSeason[0]+=int(line[3])
+					comm[com].numSeason[1]+=int(line[4])
+					comm[com].numSeason[2]+=int(line[5])
+					comm[com].numSeason[3]+=int(line[6])
+			f.close()
+			numSeasonMax = 0
+			for com in range(1,78):
+				for i in range(4):
+					if comm[com].numSeason[i]>numSeasonMax:
+						numSeasonMax = comm[com].numSeason[i]
+			if (numSeasonMax!=0):
+				for com in range(1,78):
+					for i in range(4):
+						ratio = (comm[com].numSeason[i]+0.0)/(numSeasonMax+0.0)
+						nodeSeason[com][i] = BoxShape.create(150,1000*ratio,150)
+						nodeSeason[com][i].setPosition(comm[com].pos)
+						caveutil.orientWithHead(cam,nodeSeason[com][i])
+						nodeSeason[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
+						if (ratio > 0.8):
+							nodeSeason[com][i].setEffect('colored -d #A23333')
+						elif (ratio > 0.6):
+							nodeSeason[com][i].setEffect('colored -d #EA6A40')
+						elif (ratio > 0.4):
+							nodeSeason[com][i].setEffect('colored -d #DCA53D')
+						elif (ratio > 0.2):
+							nodeSeason[com][i].setEffect('colored -d #4F9337')
+						else:
+							nodeSeason[com][i].setEffect('colored -d silver')
 
 ##############################################################################################################
 # CREATE MENUS
@@ -458,27 +684,27 @@ btnYear[13].setChecked(True)
 menu1_3more = menu0_chicago.addSubMenu("MORE INFO")
 cc = menu1_3more.getContainer()
 btn_none = Button.create(cc)
-btn_none.setUIEventCommand('clickMoreInfo(0)')
+btn_none.setUIEventCommand('clickMoreInfo')
 btn_none.setCheckable(True)
 btn_none.setRadio(True)
 btn_none.setChecked(True)
 btn_none.setText('no more info')
 
 btn_hour = Button.create(cc)
-btn_hour.setUIEventCommand('clickMoreInfo(1)')
+btn_hour.setUIEventCommand('clickMoreInfo')
 #btn_hour.setChecked(True)
 btn_hour.setCheckable(True)
 btn_hour.setRadio(True)
 btn_hour.setText('hour of day')
 
 btn_day = Button.create(cc)
-btn_day.setUIEventCommand('clickMoreInfo(2)')
+btn_day.setUIEventCommand('clickMoreInfo')
 btn_day.setCheckable(True)
 btn_day.setRadio(True)
 btn_day.setText('day of week')
 
 btn_season = Button.create(cc)
-btn_season.setUIEventCommand('clickMoreInfo(3)')
+btn_season.setUIEventCommand('clickMoreInfo')
 btn_season.setCheckable(True)
 btn_season.setRadio(True)
 btn_season.setText('season of year')
@@ -488,110 +714,6 @@ cc = menu1_4simu.getContainer()
 label_simu = Label.create(cc)
 label_simu.setText("TEST SIMULATION")
 # TO DO simulation
-
-# paths for crime sprites
-spritePath = [None]*11
-for i in range(1,11):
-	spritePath[i] = "icon/"+str(i)+".png"
-
-# INITIALIZE THE SCENE
-scene = getSceneManager()
-scene.setBackgroundColor(Color(0, 0, 0, 1))
-env = getSoundEnvironment()
-all = SceneNode.create("everything")
-
-# create a directional light
-light1 = Light.create()
-light1.setLightType(LightType.Directional)
-light1.setLightDirection(Vector3(-1.0, -1.0, -1.0))
-light1.setColor(Color(0.7, 0.7, 0.7, 1.0))
-light1.setAmbient(Color(0.5, 0.5, 0.5, 1.0))
-light1.setEnabled(True)
-
-# load some earth models
-torusModel1 = ModelInfo()
-torusModel2 = ModelInfo()
-torusModel3 = ModelInfo()
-torusModel4 = ModelInfo()
-
-torusModel1.name = "earth"
-torusModel2.name = "map"
-torusModel3.name = 'yahoo_earth'
-torusModel4.name = 'yahoo_map'
-
-if caveutil.isCAVE():
-	torusModel2.path = "openstreetmap.earth"
-	#torusModel2.path = "simple.earth"
-	#laptop: crash when start
-	#cave: it works!
-
-	torusModel1.path = "mapquestaerial.earth"
-	#torusModel.path = "simple.earth"
-	#laptop: crash when start
-	#cave: it works!
-
-	torusModel3.path = "yahoo_aerial.earth"
-	#laptop: it works (without showing anything)
-	#cave: works (too low no data)
-
-	torusModel4.path = "yahoo_maps.earth"
-	#laptop: crash during running / it works (without showing anything)
-	#cave: works (too low no data)
-
-else:
-	torusModel1.path = "simple.earth"
-	torusModel2.path = "simple.earth"
-
-scene.loadModel(torusModel1)
-scene.loadModel(torusModel2)
-scene.loadModel(torusModel3)
-scene.loadModel(torusModel4)
-
-# create scene objects using the loaded models
-torus1 = StaticObject.create("earth")
-torus1.getMaterial().setLit(False)
-all.addChild(torus1)
-
-torus2 = StaticObject.create("map")
-torus2.getMaterial().setLit(False)
-all.addChild(torus2)
-torus2.setVisible(False)
-
-torus3 = StaticObject.create("yahoo_earth")
-torus3.getMaterial().setLit(False)
-all.addChild(torus3)
-torus3.setVisible(False)
-
-torus4 = StaticObject.create("yahoo_map")
-torus4.getMaterial().setLit(False)
-all.addChild(torus3)
-torus4.setVisible(False)
-
-# create crime models
-spriteSize = sprite.createSizeUniform()
-#spriteSize.setFloat(0.1)
-spriteWindowSize = sprite.createWindowSizeUniform()
-spriteWindowSize = None
-#if caveutil.isCAVE():
-#	spriteWindowSize.setVector2f(Vector2(10000, 1000))
-#else:
-#	spriteWindowSize.setVector2f(Vector2(854, 480))
-
-cam = getDefaultCamera()
-setNearFarZ(1, 20 * r_a)
-
-# set the camera by hand
-cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
-cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-
-# set a fast speed for travel by default
-cam.getController().setSpeed(10000)
-
-# set interpolation animation
-interp = InterpolActor(cam)
-interp.setTransitionType(InterpolActor.SMOOTH)
-interp.setDuration(3)
-interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
 
 # CTA stops
 f = open('CHICAGO_DATA/cta_L_stops/cta_L_stops_final.csv', 'rb')
@@ -767,7 +889,7 @@ for i in range(1,78):
 	posComm = llh2ecef(comm[i].lat, comm[i].lon, 300.0)
 	labelComm[i].setPosition(posComm)
 	labelComm[i].setFixedSize(True)
-	labelComm[i].setColor(Color('#cccccc')) # Silver
+	labelComm[i].setColor(Color('black'))
 	caveutil.orientWithHead(cam, labelComm[i])
 	all.addChild(labelComm[i])
 
@@ -907,8 +1029,8 @@ def onEvent():
 	elif e.getServiceType() == ServiceType.Wand:
 		if isButton7down:
 			trans = e.getPosition()-wandOldPos
-			cam.setPosition( cam.convertLocalToWorldPosition( trans*300 ) )
-
+			#cam.setPosition( cam.convertLocalToWorldPosition( trans*cam.getController.getSpeed() ) )
+			cam.translate( trnas*cam.getController.getSpeed(), Space.Local)
 			oriVecOld = quaternionToEuler(wandOldOri)
 			oriVec = quaternionToEuler(wandOri)
 			cam.rotate( oriVec-oriVecOld, 5*math.pi/180, Space.Local )
@@ -941,12 +1063,14 @@ def onUpdate(frame, t, dt):
 	if (t-bgmDeltaT>=86):
 		print "replaying bgm"
 		bgmDeltaT = t
-		playBGM()
+		#playBGM()
 
 	if (t-labelCommDeltaT>1):
 		labelCommDeltaT = t
 		for i in range(1,78):
 			caveutil.orientWithHead(cam, labelComm[i])
+		if needUpdateHour or needUpdateSeason or needUpdateDay:
+			clickMoreInfo()
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
