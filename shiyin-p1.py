@@ -124,11 +124,10 @@ for i in range(1,11):
 spriteSize = sprite.createSizeUniform()
 #spriteSize.setFloat(0.1)
 spriteWindowSize = sprite.createWindowSizeUniform()
-spriteWindowSize = None
 #if caveutil.isCAVE():
 #	spriteWindowSize.setVector2f(Vector2(10000, 1000))
 #else:
-#	spriteWindowSize.setVector2f(Vector2(854, 480))
+spriteWindowSize.setVector2f(Vector2(854, 480))
 
 # get the camera
 cam = getDefaultCamera()
