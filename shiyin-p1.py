@@ -1024,7 +1024,7 @@ def onUpdate(frame, t, dt):
 		r=400
 	cam.getController().setSpeed(r*1.2)
 
-	#if (t-trainDeltaT>=10):
+	#if (t-trainDeltaT>=20):
 		#print "start updating CTA trains"
 		#trainDeltaT = t
 		#getTrainInfo()
