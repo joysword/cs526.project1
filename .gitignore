@@ -1,0 +1,10 @@
+*.csv
+*.shp
+*.shx
+*.dbf
+*.qix
+*.sbn
+*.sbx
+CHICAGO_DATA/
+cta_L_stop/
+sound/
