@@ -1,47 +1,21 @@
-<!-- 
+<!--
 OpenStreetMap's Mapnik "Slippy Map" - Geocentric.
 See:
 http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 -->
 
 <map name="OpenStreetMap" type="geocentric" version="2">
- 
+
     <image name="osm_mapnik" driver="xyz">
         <url>http://[abc].tile.openstreetmap.org/{z}/{x}/{y}.png</url>
         <profile>spherical-mercator</profile>
         <cache_policy usage="none"/>
     </image>
-    
+
     <options>
         <lighting>false</lighting>
         <terrain>
             <min_tile_range_factor>8</min_tile_range_factor>
         </terrain>
     </options>
-
-    <model name="community" driver="feature_geom" enabled="true" visible="true">
-        <features name="community" driver="ogr" build_spatial_index="true">
-            <url>CHICAGO_DATA/commareas/CommAreas.shp</url>
-        </features>
-
-        <styles>
-            <style type="text/css">
-                red {
-                    point-size:                   50;
-                    fill:                         #ff0000;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-        </styles>
-        
-        <!--
-        <fading max_range="3500"/>
-        -->
-
-        <layout crop_features="true" tile_size_factor="15">
-            <level max_range="100000000"/>
-        </layout>
-    </model>
-    
 </map>

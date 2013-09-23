@@ -1,4 +1,4 @@
-<!-- 
+<!--
 MapQuest - Open Aerial Map
 LOD 1-12 worldwide; 12+ US-only.
 http://developer.mapquest.com/web/products/open/map
@@ -10,43 +10,18 @@ TIP: set your OSG_NUM_HTTP_DATABASE_THREADS to 4 or more!
 -->
 
 <map name="MapQuest Open Aerial" type="geocentric" version="2">
- 
+
     <image name="mapquest_open_aerial" driver="xyz">
         <url>http://oatile[1234].mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg</url>
         <profile>spherical-mercator</profile>
         <cache_policy usage="no_cache"/>
         <nodata_image>http://oatile3.mqcdn.com/tiles/1.0.0/sat/13/636/6210.jpg</nodata_image>
     </image>
-    
+
     <options>
         <lighting>false</lighting>
         <terrain>
             <min_tile_range_factor>9</min_tile_range_factor>
         </terrain>
     </options>
-    
-    <model name="community" driver="feature_geom" enabled="true" visible="true">
-        <features name="community" driver="ogr" build_spatial_index="true">
-            <url>CHICAGO_DATA/commareas/CommAreas.shp</url>
-        </features>
-
-        <styles>
-            <style type="text/css">
-                red {
-                    point-size:                   50;
-                    fill:                         #ff0000;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-        </styles>
-        
-        <!--
-        <fading max_range="3500"/>
-        -->
-
-        <layout crop_features="true" tile_size_factor="15">
-            <level max_range="100000000"/>
-        </layout>
-    </model>
 </map>

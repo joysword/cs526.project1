@@ -8,38 +8,13 @@ the provider's terms of service when using their data.
 -->
 
 <map name="Yahoo maps" type="geocentric" version="2">
-    
+
     <image name="roads map" driver="yahoo">
         <dataset>roads</dataset>
     </image>
-    
+
     <options>
         <lighting>false</lighting>
     </options>
 
-    <model name="community" driver="feature_geom" enabled="true" visible="true">
-        <features name="community" driver="ogr" build_spatial_index="true">
-            <url>CHICAGO_DATA/commareas/CommAreas.shp</url>
-        </features>
-
-        <styles>
-            <style type="text/css">
-                red {
-                    point-size:                   50;
-                    fill:                         #ff0000;
-                    altitude-clamping:            terrain;
-                    altitude-technique:           gpu;
-                }
-            </style>
-        </styles>
-        
-        <!--
-        <fading max_range="3500"/>
-        -->
-
-        <layout crop_features="true" tile_size_factor="15">
-            <level max_range="100000000"/>
-        </layout>
-    </model>
-   
 </map>
