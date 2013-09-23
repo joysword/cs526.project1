@@ -1115,7 +1115,7 @@ for i in range(1,78):
 ##############################################################################################################
 # SOUND FUNCTIONS
 def playLoadSound(e):
-	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/loading.mp3"))
+	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/loading.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(0.1)
 	sd.setWidth(20)
@@ -1133,13 +1133,13 @@ def playBtnUpSound(e):
 	sd.setWidth(20)
 	#sd.play()
 def playMovingSound():
-	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/moving.mp3"))
+	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/moving.wav"))
 	sd.setPosition( cam.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
 def playBGM():
-	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.mp3"))
+	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.wav"))
 	sd.setPosition( cam.getPosition() )
 	sd.setVolume(0.05)
 	sd.setWidth(20)
