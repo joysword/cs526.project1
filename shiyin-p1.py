@@ -705,7 +705,7 @@ def goCommunities(x):
 	newLon = comm[x].lon
 	newPos = llh2ecef(newLat, newLon, 3000) # 5000 meters high
 
-	#playMovingSound()
+	playMovingSound()
 
 	drawCommAreas(x)
 
@@ -1082,7 +1082,7 @@ for items in lines:
 	#crime_lat = float(items[5])
 	#crime_lon = float(items[6])
 
-	pos = llh2ecef(crime_lat, crime_lon, 100.0)
+	pos = llh2ecef(crime_lat, crime_lon, 30.0)
 
 	crimeIcon = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
 	crimeIcon.setPosition(pos)
@@ -1118,6 +1118,8 @@ for i in range(1,78):
 
 ##############################################################################################################
 # SOUND FUNCTIONS
+env.setAssetDirectory('shi')
+
 def playLoadSound():
 	sd = SoundInstance(env.loadSoundFromFile('btnDown',"/home/evl/cs526/fall2013/shi/sound/loading.wav"))
 	sd.setPosition( cam.getPosition() )
@@ -1253,7 +1255,7 @@ trainDeltaT = 0
 bgmDeltaT = 0
 labelCommDeltaT = 0
 SimDeltaT = 0
-#getTrainInfo()
+getTrainInfo()
 playBGM()
 
 ## update
@@ -1293,7 +1295,7 @@ def onUpdate(frame, t, dt):
 	cam.getController().setSpeed(r*1.1)
 
 	if (frame>10):
-		if (t-trainDeltaT>=30):
+		if (t-trainDeltaT>=40):
 			print "start updating CTA trains"
 			trainDeltaT = t
 			getTrainInfo()
