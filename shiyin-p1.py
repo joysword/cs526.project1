@@ -69,13 +69,13 @@ torusModel3.name = 'yahoo_earth'
 torusModel4.name = 'yahoo_map'
 
 if caveutil.isCAVE():
-	torusModel2.path = "openstreetmap.earth"
-	#torusModel2.path = "simple.earth"
+	torusModel1.path = "mapquestaerial.earth"
+	#torusModel.path = "simple.earth"
 	#laptop: crash when start
 	#cave: it works!
 
-	torusModel1.path = "mapquestaerial.earth"
-	#torusModel.path = "simple.earth"
+	torusModel2.path = "openstreetmap.earth"
+	#torusModel2.path = "simple.earth"
 	#laptop: crash when start
 	#cave: it works!
 
@@ -124,30 +124,33 @@ for i in range(1,11):
 
 ## create crime models
 spriteSize = sprite.createSizeUniform()
-#spriteSize.setFloat(0.1)
 spriteWindowSize = sprite.createWindowSizeUniform()
-#if caveutil.isCAVE():
-#	spriteWindowSize.setVector2f(Vector2(10000, 1000))
-#else:
-spriteWindowSize.setVector2f(Vector2(854, 480))
+if caveutil.isCAVE():
+	spriteWindowSize.setVector2f(Vector2(1366, 768))
+else:
+	spriteWindowSize.setVector2f(Vector2(854, 480))
 
 ## get the camera
 cam = getDefaultCamera()
-cam.setPosition(-wgs84_a*4,0,0)
-cam.lookAt(Vector3(0,0,0),Vector3(0,0,1))
+#cam.setPosition(Vector3(wgs84_a*1,-wgs84_a*2.1,0))
+#print 'cam:',cam.getPosition()
+#cam.setPosition(Vector3(0,0,8000000))
+cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
+cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+#cam.lookAt(Vector3(0,0,0),Vector3(0,0,1))
+#cam.rotate(Vector3(0,1,0),math.pi/4.0,Space.Local)
 setNearFarZ(1, 20 * r_a)
-
 ## set a fast speed for travel by default
 cam.getController().setSpeed(10000)
 
 ## set interpolation animation
 interp = InterpolActor(cam)
-interp.setTransitionType(InterpolActor.SMOOTH)
-interp.setDuration(7)
+interp.setTransitionType(InterpolActor.LINEAR)
+interp.setDuration(10)
 interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
 
 ## toggleStereo
-toggleStereo()
+#toggleStereo()
 
 ## create communities
 class community:
@@ -388,7 +391,10 @@ def clickMoreInfo():
 				for i in range(4):
 					ratio = (comm[com].numHour[i]+0.0)/(numHourMax+0.0)
 					nodeHDS[com][i].setPosition(comm[com].pos)
+
 					caveutil.orientWithHead(cam,nodeHDS[com][i])
+					#nodeHDS[com][i].setFacingCamera(cam)
+
 					nodeHDS[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
 					nodeHDS[com][i].setScale(1,ratio,1)
 
@@ -434,7 +440,10 @@ def clickMoreInfo():
 				for i in range(7):
 					ratio = (comm[com].numDay[i]+0.0)/(numDayMax+0.0)
 					nodeHDS[com][i].setPosition(comm[com].pos)
+
 					caveutil.orientWithHead(cam,nodeHDS[com][i])
+					#nodeHDS[com][i].setFacingCamera(cam)
+
 					nodeHDS[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
 					nodeHDS[com][i].setScale(1,ratio,1)
 
@@ -480,7 +489,10 @@ def clickMoreInfo():
 				for i in range(4):
 					ratio = (comm[com].numSeason[i]+0.0)/(numSeasonMax+0.0)
 					nodeHDS[com][i].setPosition(comm[com].pos)
+
 					caveutil.orientWithHead(cam,nodeHDS[com][i])
+					#nodeHDS[com][i].setFacingCamera(cam)
+
 					nodeHDS[com][i].translate(200*(i-1.5),500*ratio+200,0, Space.Local)
 					nodeHDS[com][i].setScale(1,ratio,1)
 
@@ -513,8 +525,11 @@ ui = uim.getUi()
 timer = wf.createLabel('timer', ui, '01-01 00:00')
 timer.setColor(Color('white'))
 if caveutil.isCAVE():
-	timer.setFont('font/helvetica.ttf 100')
-	timer.setPosition(Vector2(4000,0))
+	timer.setFont('font/helvetica.ttf 150')
+	timer.setPosition(Vector2(13000,1600))
+
+	timer.setSize(Vector2(1000,200))
+	timer.setStyleValue('fill', 'black')
 else:
 	timer.setFont('font/helvetica.ttf 20')
 	timer.setPosition(Vector2(400,0))
@@ -551,18 +566,21 @@ def IOWatchMode(x):
 				crime_lon = float(line[5])
 				crime_minute = int(line[7])
 				crime_com = int(line[3])
-				sim_node[i] = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
+				sim_node[i] = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, False)
 				sim_node[i].setPosition(llh2ecef(crime_lat, crime_lon, 100.0))
-				sim_node[i].getMaterial().setLit(False)
+				#sim_node[i].getMaterial().setLit(False)
 				sim_node[i].setVisible(False)
 				sim_node_min[i] = crime_minute
 				i+=1
 			timer.setVisible(True)
 			print ('ready')
 
+		#for j in range(1,14):
+		#	for i in range(1,78):
+		#		print j,i,nodeComm[i].getChildByIndex(j).isVisible()
 
-	else:
-		if (isWathcing):
+	else: # QUIT
+		if (isWatching):
 			isWatching=False
 			for i in range(5000):
 				sim_node[i].setVisible(False)
@@ -572,6 +590,7 @@ def IOWatchMode(x):
 					n = nodeComm[com].getChildByIndex(year)
 					for crime in range(1,11):
 						if n.isVisible() and n.getChildByIndex(crime).isVisible():
+							#print 'com:%d,year:%d,crime:%d'%(com,year,crime)
 							n.getChildByIndex(crime).setChildrenVisible(True)
 			isPlaying=0
 			sim_minute=0
@@ -588,6 +607,7 @@ def clickPlayButton():
 ## pause and stop
 def clickPauseButton():
 	global isPlaying
+	global sim_minute
 
 	if isPlaying!=0:
 		isPlaying-=1
@@ -681,11 +701,15 @@ def goCommunities(x):
 	newLon = comm[x].lon
 	newPos = llh2ecef(newLat, newLon, 3000) # 5000 meters high
 
-	interp.setDuration(3)
+	#playMovingSound()
+
+	drawCommAreas(x)
+
+	interp.setDuration(4)
 	interp.setTargetPosition(newPos)
 	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 	interp.startInterpolation()
-	playMovingSound()
+
 
 ##############################################################################################################
 # CREATE MENUS
@@ -882,14 +906,17 @@ for stop in ctastops:
 	text = Text3D.create('font/helvetica.ttf', 100, stop[2])
 	if caveutil.isCAVE()==False:
 		text = Text3D.create('font/helvetica.ttf', 15, stop[2])
+
 	caveutil.orientWithHead(cam, text)
+	#text.setFacingCamera(cam)
+
 	text.roll(math.pi/4*0.75)
 
 	posText = llh2ecef(float(stop[1]), float(stop[0]), 100.0)
 	text.setPosition(posText)
 	text.setFixedSize(True)
 	if caveutil.isCAVE():
-		text.setColor(Color('black'))
+		text.setColor(Color('#232323'))
 	else:
 		text.setColor(Color('white'))
 
@@ -972,6 +999,42 @@ def getTrainInfo():
 	print ("train updated!")
 
 ##############################################################################################################
+# COMMUNITY BOUNDARIES
+nodeCommAreasParent = SceneNode.create('nodeCommAreasParent')
+all.addChild(nodeCommAreasParent)
+
+def drawCommAreas(com):
+	global all
+
+	num = nodeCommAreasParent.numChildren()
+	for i in range(num):
+		nodeCommAreasParent.removeChildByIndex(0)
+
+	f = open('CHICAGO_DATA/commareas.csv', 'rb')
+	ctaLines = csv.reader(f)
+	for seg in ctaLines:
+		if int(seg[0])==com:
+			xLine = LineSet.create()
+			oldPos = Vector3()
+			for i in range(3,len(seg)):
+				if i==3:
+					coo = seg[i].split(',')
+					oldPos = llh2ecef(float(coo[1]),float(coo[0]), 0.0)
+				else:
+					coo = seg[i].split(',')
+					pos = llh2ecef(float(coo[1]),float(coo[0]), 0.0)
+					if (pos!=oldPos):
+						l = xLine.addLine()
+						l.setStart(oldPos)
+						l.setEnd(pos)
+						l.setThickness(30.0)
+						oldPos = pos
+			xLine.setEffect('colored -d #8000FF')
+			nodeCommAreasParent.addChild(xLine)
+			break
+	f.close()
+
+##############################################################################################################
 # VICE CITY
 nodeComm = [None]*78
 nodeYear = [None]*14
@@ -987,15 +1050,16 @@ for i in range(0,78):
 	for j in range(0,14):
 		name1 = name+"year"+str(2000+j)
 		nodeYear[j] = SceneNode.create(name1)
-		if (j==13):
-			nodeYear[j].setVisible(True)
-		else:
-			nodeYear[j].setVisible(False)
+		nodeYear[j].setVisible(False)
 		nodeComm[i].addChild(nodeYear[j])
 		for k in range(0,11):
 			name2 = name1+"crimetype"+str(k)
 			nodeCrime[k] = SceneNode.create(name2)
 			nodeYear[j].addChild(nodeCrime[k])
+	nodeComm[i].getChildByIndex(13).setVisible(True)
+
+#for i in range(1,78):
+#		print i,nodeComm[i].getChildByIndex(13).isVisible()
 
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
@@ -1003,7 +1067,7 @@ lines = csv.reader(f)
 atLine = 0
 for items in lines:
 	atLine+=1
-	if (atLine>1000):
+	if (atLine>6500):
 		break
 	crime_type = items[2]
 	crime_comm = int(items[4])
@@ -1018,7 +1082,7 @@ for items in lines:
 
 	crimeIcon = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
 	crimeIcon.setPosition(pos)
-	crimeIcon.getMaterial().setLit(False)
+	#crimeIcon.getMaterial().setLit(False)
 	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(crimeIcon)
 	comm[crime_comm].numCrime[crime_year-2000][crimeType[crime_type]]+=1
  	if crime_year==2013:
@@ -1033,15 +1097,18 @@ labelComm = [None]*78
 
 for i in range(1,78):
 	if caveutil.isCAVE():
-		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 200, comm[i].name+' ('+str(comm[i].numCrimeShown)+')')
+		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 160, comm[i].name+' ('+str(comm[i].numCrimeShown)+')')
 	else:
 		labelComm[i] = Text3D.create('font/Franchise-Bold-hinted.ttf', 20, comm[i].name+' ('+str(comm[i].numCrimeShown)+')')
 
 	posComm = llh2ecef(comm[i].lat, comm[i].lon, 300.0)
 	labelComm[i].setPosition(posComm)
 	labelComm[i].setFixedSize(True)
-	labelComm[i].setColor(Color('black'))
+	labelComm[i].setColor(Color('white'))
+
 	caveutil.orientWithHead(cam, labelComm[i])
+	#labelComm[i].setFacingCamera(cam)
+
 	all.addChild(labelComm[i])
 
 # TEST FACE CAMERA
@@ -1055,9 +1122,9 @@ for i in range(1,78):
 # SOUND FUNCTIONS
 def playBtnDownSound(e):
 	print ('button down')
-	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/menu/down.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/menu/down_new.wav"))
 	sd.setPosition( e.getPosition() )
-	sd.setVolume(1.0)
+	sd.setVolume(0.1)
 	sd.setWidth(20)
 	sd.play()
 def playBtnUpSound(e):
@@ -1066,7 +1133,7 @@ def playBtnUpSound(e):
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
-	sd.play()
+	#sd.play()
 def playMovingSound():
 	print ('on the move')
 	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/move.wav"))
@@ -1077,7 +1144,7 @@ def playMovingSound():
 def playBGM():
 	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.wav"))
 	sd.setPosition( cam.getPosition() )
-	sd.setVolume(0.3)
+	sd.setVolume(0.1)
 	sd.setWidth(20)
 	sd.play()
 
@@ -1113,6 +1180,10 @@ def onEvent():
 			torus4.setVisible(False)
 			torus1.setVisible(True)
 
+	elif (e.isButtonDown(EventFlags.Button5)):
+		playBtnDownSound(e)
+		cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
+		cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 	elif (e.isButtonDown(EventFlags.Button7)):
 		playBtnDownSound(e)
 		#if isButton7down==False:
@@ -1128,18 +1199,15 @@ def onEvent():
 	elif (e.isButtonDown(EventFlags.Button2)):
 		playBtnDownSound(e)
 		if isWatching:
+			# Mark the event  as processed.
 			clickPlayButton()
-
-	elif (e.isButtonUp(EventFlags.Button2)):
-		playBtnUpSound(e)
+			#e.setProcessed()
 
 	elif (e.isButtonDown(EventFlags.Button3)):
 		playBtnDownSound(e)
 		if isWatching:
 			clickPauseButton()
-
-	elif (e.isButtonUp(EventFlags.Button3)):
-		playBtnUpSound(e)
+			e.setProcessed()
 
 	#elif (e.getType()==EventType.Update) and (isButton7down):
 	#	e.getAxis(0)
@@ -1169,12 +1237,13 @@ def onEvent():
 
 	elif e.getServiceType() == ServiceType.Wand:
 		if isButton7down:
+			print 'button7isdown'
 			trans = e.getPosition()-wandOldPos
-			#cam.setPosition( cam.convertLocalToWorldPosition( trans*cam.getController.getSpeed() ) )
-			cam.translate( trnas*cam.getController.getSpeed(), Space.Local)
+			#cam.setPosition( cam.convertLocalToWorldPosition( trans*cam.getController().getSpeed() ) )
+			cam.translate( trans*cam.getController().getSpeed(), Space.Local)
 			oriVecOld = quaternionToEuler(wandOldOri)
-			oriVec = quaternionToEuler(wandOri)
-			cam.rotate( oriVec-oriVecOld, 5*math.pi/180, Space.Local )
+			oriVec = quaternionToEuler(e.getOrientation())
+			cam.rotate( oriVec-oriVecOld, 2*math.pi/180, Space.Local )
 
 trainDeltaT = 0
 bgmDeltaT = 0
@@ -1193,56 +1262,62 @@ def onUpdate(frame, t, dt):
 	global sim_minute
 	global sim_at_line
 
-	if frame==5:
-		interp.setTargetPosition(Vector3(193124.87, -4767697.65, 4228566.18))
-		interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-		interp.startInterpolation()
+	#if frame==5:
+	#	interp.setTargetPosition(Vector3(193124.87, -4767697.65, 4228566.18))
+	#	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+	#	interp.startInterpolation()
 
 	d = cam.getPosition()
 	d0 = float(d.x)
 	d1 = float(d.y)
 	d2 = float(d.z)
 	r = math.sqrt(d0*d0 + d1*d1 + d2*d2) - r_a # altitude in cm
-	if r<400:
-		r=400
-	cam.getController().setSpeed(r*1.2)
+	if r<300:
+		r=300
+	cam.getController().setSpeed(r*1.1)
 
-	#if (t-trainDeltaT>=20):
-		#print "start updating CTA trains"
-		#trainDeltaT = t
-		#getTrainInfo()
+	#if frame==100:
+	#	print ('start drawing comm')
+	#	drawCommAreas()
+	#	print ('done')
 
-	if (isPlaying==2):
-		print'isPlaying==2'
-		if (t-SimDeltaT>0.1):
-			print 'need update'
-			SimDeltaT=t
-			sim_minute+=1
-			updateSim()
+	if (frame>10):
+		if (t-trainDeltaT>=30):
+			print "start updating CTA trains"
+			trainDeltaT = t
+			getTrainInfo()
 
-		# if finished
-		#if sim_minute==525600: whole year
-		if sim_minute>44200: # 5000th node's minute is 44160
-			isPlaying=0
-			SimDeltaT=0
-			sim_minute=0
-			sim_at_line = 0
-	elif isPlaying==0:
-		SimDeltaT = 0
+		if (isPlaying==2):
+			print'isPlaying==2'
+			if (t-SimDeltaT>0.1):
+				print 'need update'
+				SimDeltaT=t
+				sim_minute+=1
+				updateSim()
 
-	if (t-labelCommDeltaT>1):
-		labelCommDeltaT = t
-		for i in range(1,78):
-			caveutil.orientWithHead(cam, labelComm[i])
-		#if needUpdateHour or needUpdateSeason or needUpdateDay:
-		if needUpdateHDS:
-			clickMoreInfo()
+			# if finished
+			#if sim_minute==525600: whole year
+			if sim_minute>44200: # 5000th node's minute is 44160
+				isPlaying=0
+				SimDeltaT=0
+				sim_minute=0
+				sim_at_line = 0
+		elif isPlaying==0:
+			SimDeltaT = 0
 
-	# replay bgm
-	if (t-bgmDeltaT>=86):
-		print "replaying bgm"
-		bgmDeltaT = t
-		#playBGM()
+		if (t-labelCommDeltaT>1):
+			labelCommDeltaT = t
+			for i in range(1,78):
+				caveutil.orientWithHead(cam, labelComm[i])
+			#if needUpdateHour or needUpdateSeason or needUpdateDay:
+			if needUpdateHDS:
+				clickMoreInfo()
+
+		# replay bgm
+		if (t-bgmDeltaT>=86):
+			print "replaying bgm"
+			bgmDeltaT = t
+			#playBGM()
 
 setEventFunction(onEvent)
 setUpdateFunction(onUpdate)
