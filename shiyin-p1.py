@@ -132,23 +132,25 @@ else:
 
 ## get the camera
 cam = getDefaultCamera()
-#cam.setPosition(Vector3(wgs84_a*1,-wgs84_a*2.1,0))
-#print 'cam:',cam.getPosition()
-#cam.setPosition(Vector3(0,0,8000000))
-cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
-cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-#cam.lookAt(Vector3(0,0,0),Vector3(0,0,1))
-#cam.rotate(Vector3(0,1,0),math.pi/4.0,Space.Local)
+cam.setPosition(Vector3(wgs84_a*1,-wgs84_a*2.1,0))
+
+#cam.setPosition(Vector3(193124.87, -4767697.65, 4228566.18))
+#cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+
 setNearFarZ(1, 20 * r_a)
 ## set a fast speed for travel by default
 cam.getController().setSpeed(10000)
 
 ## set interpolation animation
+interp1 = InterpolActor(cam)
+interp1.setTransitionType(InterpolActor.LINEAR)
+interp1.setDuration(10)
+interp1.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
+
 interp = InterpolActor(cam)
 interp.setTransitionType(InterpolActor.LINEAR)
-interp.setDuration(10)
+interp.setDuration(4)
 interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
-
 ## toggleStereo
 #toggleStereo()
 
@@ -705,7 +707,6 @@ def goCommunities(x):
 
 	drawCommAreas(x)
 
-	interp.setDuration(4)
 	interp.setTargetPosition(newPos)
 	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 	interp.startInterpolation()
@@ -894,7 +895,10 @@ btn_stop.setUIEventCommand('IOWatchMode(0)')
 ##############################################################################################################
 # CTA RELATED
 ## CTA stops
-f = open('CHICAGO_DATA/cta_L_stops/cta_L_stops_final.csv', 'rb')
+nodeCTATextParent = SceneNode.create('nodeCTATextParent')
+all.addChild(nodeCTATextParent)
+
+f = open('CHICAGO_DATA/cta_L_stops/cta_L_stops_final_new.csv', 'rb')
 ctastops = csv.reader(f)
 for stop in ctastops:
 	model = SphereShape.create(50, 3)
@@ -902,26 +906,27 @@ for stop in ctastops:
 	pos = llh2ecef(float(stop[1]), float(stop[0]), 0.0)
 	model.setPosition(pos)
 	model.setEffect('colored -d white')
-
-	text = Text3D.create('font/helvetica.ttf', 100, stop[2])
-	if caveutil.isCAVE()==False:
-		text = Text3D.create('font/helvetica.ttf', 15, stop[2])
-
-	caveutil.orientWithHead(cam, text)
-	#text.setFacingCamera(cam)
-
-	text.roll(math.pi/4*0.75)
-
-	posText = llh2ecef(float(stop[1]), float(stop[0]), 100.0)
-	text.setPosition(posText)
-	text.setFixedSize(True)
-	if caveutil.isCAVE():
-		text.setColor(Color('#232323'))
-	else:
-		text.setColor(Color('white'))
-
 	all.addChild(model)
-	all.addChild(text)
+
+	if cmp(stop[2],'-')!=0:
+		text = Text3D.create('font/helvetica.ttf', 100, stop[2])
+		if caveutil.isCAVE()==False:
+			text = Text3D.create('font/helvetica.ttf', 15, stop[2])
+
+		#caveutil.orientWithHead(cam, text)
+		#text.setFacingCamera(cam)
+
+		#text.roll(math.pi/4*0.75)
+
+		posText = llh2ecef(float(stop[1]), float(stop[0]), 100.0)
+		text.setPosition(posText)
+		text.setFixedSize(True)
+		if caveutil.isCAVE():
+			text.setColor(Color('#1f1f1f'))
+		else:
+			text.setColor(Color('white'))
+		nodeCTATextParent.addChild(text)
+
 f.close()
 
 ## CTA lines
@@ -1142,7 +1147,7 @@ def playMovingSound():
 	sd.setWidth(20)
 	sd.play()
 def playBGM():
-	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.mp3"))
 	sd.setPosition( cam.getPosition() )
 	sd.setVolume(0.1)
 	sd.setWidth(20)
@@ -1253,6 +1258,8 @@ SimDeltaT = 0
 #playBGM()
 
 ## update
+t_interp = 0
+
 def onUpdate(frame, t, dt):
 	global trainDeltaT
 	global bgmDeltaT
@@ -1261,11 +1268,21 @@ def onUpdate(frame, t, dt):
 	global isPlaying
 	global sim_minute
 	global sim_at_line
+	global t_interp
 
-	#if frame==5:
-	#	interp.setTargetPosition(Vector3(193124.87, -4767697.65, 4228566.18))
-	#	interp.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
-	#	interp.startInterpolation()
+	if frame==5:
+		interp1.setTargetPosition(Vector3(193124.87, -4767697.65, 4228566.18))
+		interp1.setTargetOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
+		interp1.startInterpolation()
+		t_interp = t
+		#interp1.setEndOfInterpolationFunction(setFacing)
+
+	elif (t - t_interp > 12):
+		num = nodeCTATextParent.numChildren()
+		for i in range(num):
+			caveutil.orientWithHead(cam, nodeCTATextParent.getChildByIndex(i))
+			#nodeCTATextParent.getChildByIndex(i).setFacingCamera(cam)
+			nodeCTATextParent.getChildByIndex(i).roll(math.pi/4*0.75)
 
 	d = cam.getPosition()
 	d0 = float(d.x)
@@ -1275,11 +1292,6 @@ def onUpdate(frame, t, dt):
 	if r<300:
 		r=300
 	cam.getController().setSpeed(r*1.1)
-
-	#if frame==100:
-	#	print ('start drawing comm')
-	#	drawCommAreas()
-	#	print ('done')
 
 	if (frame>10):
 		if (t-trainDeltaT>=30):
