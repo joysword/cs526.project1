@@ -1069,11 +1069,7 @@ for i in range(0,78):
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
 lines = csv.reader(f)
-atLine = 0
 for items in lines:
-	atLine+=1
-	if (atLine>6500):
-		break
 	crime_type = items[2]
 	crime_comm = int(items[4])
 	crime_year = int(items[5])
@@ -1116,32 +1112,28 @@ for i in range(1,78):
 
 	all.addChild(labelComm[i])
 
-# TEST FACE CAMERA
-#testObject = PlaneShape.create(20, 20)
-#testObject.setEffect("colored -d red")
-#all.addChild(testObject)
-#caveutil.positionAtHead(cam, testObject, 2)
-#caveutil.orientWithHead(cam, testObject)
-
 ##############################################################################################################
 # SOUND FUNCTIONS
+def playLoadSound(e):
+	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/loading.mp3"))
+	sd.setPosition( e.getPosition() )
+	sd.setVolume(0.1)
+	sd.setWidth(20)
+	sd.play()
 def playBtnDownSound(e):
-	print ('button down')
 	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/menu/down_new.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(0.1)
 	sd.setWidth(20)
 	sd.play()
 def playBtnUpSound(e):
-	print ('button up')
 	sd = SoundInstance(env.loadSoundFromFile('btnUp',"sound/menu/up.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	#sd.play()
 def playMovingSound():
-	print ('on the move')
-	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/move.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/moving.mp3"))
 	sd.setPosition( cam.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
@@ -1149,7 +1141,7 @@ def playMovingSound():
 def playBGM():
 	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.mp3"))
 	sd.setPosition( cam.getPosition() )
-	sd.setVolume(0.1)
+	sd.setVolume(0.05)
 	sd.setWidth(20)
 	sd.play()
 
