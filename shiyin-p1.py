@@ -1255,7 +1255,7 @@ bgmDeltaT = 0
 labelCommDeltaT = 0
 SimDeltaT = 0
 #getTrainInfo()
-#playBGM()
+playBGM()
 
 ## update
 t_interp = 0
