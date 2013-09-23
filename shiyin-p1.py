@@ -145,6 +145,7 @@ cam.getController().setSpeed(10000)
 interp1 = InterpolActor(cam)
 interp1.setTransitionType(InterpolActor.LINEAR)
 interp1.setDuration(10)
+
 interp1.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
 
 interp = InterpolActor(cam)
@@ -152,7 +153,7 @@ interp.setTransitionType(InterpolActor.LINEAR)
 interp.setDuration(4)
 interp.setOperation(InterpolActor.POSITION | InterpolActor.ORIENT)
 ## toggleStereo
-#toggleStereo()
+toggleStereo()
 
 ## create communities
 class community:
@@ -1069,6 +1070,7 @@ for i in range(0,78):
 
 count = 0
 f = open('CrimesAll_final.csv', 'rb')
+#f = open('CrimesAll_final_8000.csv', 'rb')
 lines = csv.reader(f)
 for items in lines:
 	crime_type = items[2]
@@ -1116,39 +1118,42 @@ for i in range(1,78):
 
 ##############################################################################################################
 # SOUND FUNCTIONS
-def playLoadSound(e):
-	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/loading.wav"))
-	sd.setPosition( e.getPosition() )
-	sd.setVolume(0.1)
+def playLoadSound():
+	sd = SoundInstance(env.loadSoundFromFile('btnDown',"/home/evl/cs526/fall2013/shi/sound/loading.wav"))
+	sd.setPosition( cam.getPosition() )
+	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
 def playBtnDownSound(e):
-	sd = SoundInstance(env.loadSoundFromFile('btnDown',"sound/menu/down_new.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('btnDown',"/home/evl/cs526/fall2013/shi/sound/menu/down_new.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(0.1)
 	sd.setWidth(20)
 	sd.play()
 def playBtnUpSound(e):
-	sd = SoundInstance(env.loadSoundFromFile('btnUp',"sound/menu/up.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('btnUp',"/home/evl/cs526/fall2013/shi/sound/menu/up.wav"))
 	sd.setPosition( e.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	#sd.play()
 def playMovingSound():
-	sd = SoundInstance(env.loadSoundFromFile('moving',"sound/moving.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('moving',"/home/evl/cs526/fall2013/shi/sound/moving.wav"))
 	sd.setPosition( cam.getPosition() )
 	sd.setVolume(1.0)
 	sd.setWidth(20)
 	sd.play()
 def playBGM():
-	sd = SoundInstance(env.loadSoundFromFile('bgm',"sound/bgm.wav"))
+	sd = SoundInstance(env.loadSoundFromFile('bgm',"/home/evl/cs526/fall2013/shi/sound/bgm.wav"))
 	sd.setPosition( cam.getPosition() )
-	sd.setVolume(0.05)
+	sd.setVolume(0.09)
 	sd.setWidth(20)
 	sd.play()
 
 ##############################################################################################################
 # EVENT AND UPDATE FUNCTIONS
+print ('start playing loading sound')
+playLoadSound()
+print ('loading sound started')
 
 isButton7down = False
 wandOldPos = Vector3()
@@ -1185,12 +1190,12 @@ def onEvent():
 		cam.setOrientation(Quaternion(0.6, 0.8, 0.0, 0.0))
 	elif (e.isButtonDown(EventFlags.Button7)):
 		playBtnDownSound(e)
-		#if isButton7down==False:
-		isButton7down = True
-		wandOldPos = e.getPosition()
-		wandOldOri = e.getOrientation()
-		print "wandOldPos:",wandOldPos
-		print "wandOldOri:",wandOldOri
+		if isButton7down==False:
+			isButton7down = True
+			wandOldPos = e.getPosition()
+			wandOldOri = e.getOrientation()
+			print "wandOldPos:",wandOldPos
+			print "wandOldOri:",wandOldOri
 
 	elif (e.isButtonUp(EventFlags.Button7)):
 		isButton7down = False
