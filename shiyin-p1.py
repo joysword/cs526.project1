@@ -571,6 +571,7 @@ def IOWatchMode(x):
 				sim_node[i] = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, False)
 				sim_node[i].setPosition(llh2ecef(crime_lat, crime_lon, 100.0))
 				#sim_node[i].getMaterial().setLit(False)
+				sim_node[i].getMaterial().setColor(Color(1,1,1,1), Color(1,1,1,1))
 				sim_node[i].setVisible(False)
 				sim_node_min[i] = crime_minute
 				i+=1
@@ -1084,6 +1085,7 @@ for items in lines:
 	crimeIcon = sprite.createSprite(spritePath[crimeType[crime_type]], spriteSize, spriteWindowSize, True)
 	crimeIcon.setPosition(pos)
 	#crimeIcon.getMaterial().setLit(False)
+	crimeIcon.getMaterial().setColor(Color(1,1,1,1), Color(1,1,1,1))
 	nodeComm[crime_comm].getChildByIndex(crime_year-2000).getChildByIndex(crimeType[crime_type]).addChild(crimeIcon)
 	comm[crime_comm].numCrime[crime_year-2000][crimeType[crime_type]]+=1
  	if crime_year==2013:
