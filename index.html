@@ -1,114 +1,90 @@
 <!DOCTYPE html>
 <html>
-		<head>
-				<meta charset='utf-8'>
-				<meta http-equiv="X-UA-Compatible" content="chrome=1">
-				<meta name="description" content="Somebody's Watching Me : a python module using omegalib and osgearth to view crime data of Chicago">
-				<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-				<title>
-						Somebody's Watching Me
-				</title>
-		</head>
-		<body>
-				<!-- HEADER -->
-				<div id="header_wrap" class="outer">
-						<header class="inner">
-								<a id="forkme_banner" href="https://github.com/joysword/cs526.project1" target="_blank">View on GitHub</a>
-								<h1 id="project_title">
-										Somebody's Watching Me
-								</h1>
-								<h2 id="project_tagline">
-										a python module using omegalib and osgearth to view crime data of Chicago
-								</h2>
-								<section id="downloads">
-										<a class="zip_download_link" href="https://github.com/joysword/cs526.project1/zipball/master">Download this project as a .zip file</a> <a class="tar_download_link" href="https://github.com/joysword/cs526.project1/tarball/master">Download this project as a tar.gz file</a>
-								</section>
-						</header>
-				</div>
-				<!-- MAIN CONTENT -->
-				<div id="main_content_wrap" class="outer">
-						<section id="main_content" class="inner">
-								<h1>
-										<a name="welcome" class="anchor" href="#welcome"></a>Welcome!
-								</h1>
-								<p>
-										Welcome to the homepage of my first project of Fall 2013 Semester, Somebody's Watching Me, project 1 of Professor <a href="http://www.evl.uic.edu/aej/">Andy Johnson</a>'s <a href="http://www.evl.uic.edu/aej/526/index.html">Visualization</a> course.
-								</p>
-								<h3>
-										<a name="introduction" class="anchor" href="#introduction"></a>Introduction
-								</h3>
-								<p>
-									Generally speaking, this app allows you to:
-								</p>
-									<ol>
-											<li>'flying' around whole earth as a 3D interactive environment both in your laptop and in the <a href="http://www.evl.uic.edu/core.php?mod=4&amp;type=1&amp;indi=424">CAVE2</a>
-											</li>
-											<li>switching background between 2 maps and 2 aerial photo versions
-											</li>
-											<li>map the location of crimes in Chicago in recent years on the environment with capability of multiple filters</li>
-											<li>jump to one of the 77 community areas in Chicago fastly</li>
-											<li>analysis crime data per community area as function of the time of day, day of week, or season of year</li>
-											<li>watch the City in 'real-time'</li>
-											<li>see the CTA 'L' lines and realtime location/heading feeds of all the trains</li>
-									</ol>
-								<p>
-									Read <a href="features.html">detailed desciption</a> of all the features of this app.
-								</p>
-								<h3>
-										<a name="download-and-install" class="anchor" href="#download-and-install"></a>Download and Install
-								</h3>
-								<ol>
-										<li>have omegalib and osgearth installed. You can find an instruction for Mac <a href="https://github.com/uic-evl/omegalib/wiki/How-to-run-osgearth-in-omegalib-on-Mac">here</a>
-										</li>
-										<li>download the source code from <a href="https://github.com/joysword/cs526.project1/">Github</a>
-										</li>
-										<li>download data files at <a style="color:red">http://1234567</a>, and put them <strong>directly</strong> in the project directory
-										</li>
-										<li>to run the project, do as following:<br><code>$ &gt;cd [omegalib_build]/bin/</code><br>
-												<code>$ &gt;./orun -s [where_you_put_the_project]/shiyin-p1.py</code>
-										</li>
-								</ol>
-								<h3>
-										<a name="about-the-data" class="anchor" href="#about-the-data"></a>About the Data
-								</h3>
-								<p>
-										Data used in this project is coming from different sources, including but not limiting to
-								</p>
-								<ul>
-										<li>
-												<a href="https://data.cityofchicago.org/">City of Chicago Data Portal</a>
-										</li>
-										<li>
-												<a href="http://www.openstreetmap.org/">Open Street Map</a>
-										</li>
-										<li>
-												<a href="http://maps.yahoo.com/">Yahoo! Map</a>
-										</li>
-										<li>
-												<a href="http://osgearth.org/">OSGEARTH</a>
-										</li>
-								</ul>
-								<p>
-										<a href="data.html">More info</a> about the Data
-								</p>
-								<h3>
-										<a name="interesting-findings" class="anchor" href="#interesting-findings"></a>Interesting Findings
-								</h3>
-								<p>
-										Using this app, we are able to look into the data and discover things. See <a href="findings.html">more info</a> about what I found
-								</p>
-						</section>
-				</div>
-				<!-- FOOTER  -->
-				<div id="footer_wrap" class="outer">
-						<footer class="inner">
-								<p class="copyright">
-										Developed and Maintained by <a href="https://github.com/joysword">Shi Yin</a>
-								</p>
-								<p>
-										Published with <a href="http://pages.github.com">GitHub Pages</a>
-								</p>
-						</footer>
-				</div>
-		</body>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Somebody's Watching Me : a python module using omegalib and osgearth to view crime data of Chicago" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Somebody's Watching Me</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/joysword/cs526.project1">View on GitHub</a>
+
+          <h1 id="project_title">Somebody's Watching Me</h1>
+          <h2 id="project_tagline">a python module using omegalib and osgearth to view crime data of Chicago</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/joysword/cs526.project1/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/joysword/cs526.project1/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="data" class="anchor" href="#data"><span class="octicon octicon-link"></span></a>Data</h1>
+
+<h2>
+<a name="crime-data" class="anchor" href="#crime-data"><span class="octicon octicon-link"></span></a>Crime data</h2>
+
+<p>Crime data is from <a href="https://data.cityofchicago.org">City of Chicago Data Portal</a>
+What I did includes:</p>
+
+<ul>
+<li>downloaded crime data</li>
+<li>deleted columns that are not to be used</li>
+<li>selected major crimes based on <a href="http://local.provplan.org/feinstein/crimes_definitions.pdf">this document</a> and the number of each crime (see below)</li>
+<li>converted datetime to weekday, month, hour, minute</li>
+<li>counted the number of crimes in each community area per weekday/hour/month</li>
+</ul><p>Based on number of crime, I did
+1. Theft: only 'Over $500' are kept
+2. Burglary: only 'Forcible Entry' are kept
+3. Criminal Damage: only 'Vandalism' and 'To City of Chicago Property' are kept
+4. Assault and Sexual Assault: only Aggravated ones are kept</p>
+
+<h2>
+<a name="cta-data" class="anchor" href="#cta-data"><span class="octicon octicon-link"></span></a>CTA data</h2>
+
+<p>CTA data is from <a href="http://www.transitchicago.com/">Chicago Transit Authority</a>
+What I did (in runtime) includes:</p>
+
+<ul>
+<li>using an API call to request train locations and headings of all 'L' lines</li>
+<li>converting locations and headings to positions and orientations in 3D world</li>
+<li>drawing and updating every 40 seconds</li>
+</ul><h2>
+<a name="geo-data" class="anchor" href="#geo-data"><span class="octicon octicon-link"></span></a>Geo data</h2>
+
+<p>Geo data if from <a href="https://data.cityofchicago.org">City of Chicago Data Portal</a>
+What I did includes:</p>
+
+<ul>
+<li>downloaded KML files for CTA Lines and CTA Stops</li>
+<li>parsed the KML file to get locations of points of line sets as well as which line they belong to</li>
+<li>parsed the KML file to get locations of CTA Stops</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Somebody's Watching Me maintained by <a href="https://github.com/joysword">joysword</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
 </html>
