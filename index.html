@@ -1,121 +1,114 @@
 <!DOCTYPE html>
 <html>
-
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Somebody's Watching Me : a python module using omegalib and osgearth to view crime data of Chicago" />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Somebody's Watching Me</title>
-  </head>
-
-  <body>
-
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/joysword/cs526.project1">View on GitHub</a>
-
-          <h1 id="project_title">Somebody's Watching Me</h1>
-          <h2 id="project_tagline">a python module using omegalib and osgearth to view crime data of Chicago</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/joysword/cs526.project1/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/joysword/cs526.project1/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a name="features-and-usage" class="anchor" href="#features-and-usage"><span class="octicon octicon-link"></span></a>Features and Usage</h1>
-
-<h5>
-<a name="all-features-and-usages-are-for-running-this-app-on-cave2-if-not-noticed-otherwise" class="anchor" href="#all-features-and-usages-are-for-running-this-app-on-cave2-if-not-noticed-otherwise"><span class="octicon octicon-link"></span></a>all features and usages are for running this app on <a href="http://www.evl.uic.edu/core.php?mod=4&amp;type=1&amp;indi=424">CAVE2</a> if not noticed otherwise</h5>
-
-<h2>
-<a name="start" class="anchor" href="#start"><span class="octicon octicon-link"></span></a>Start</h2>
-
-<ul>
-<li>Once the app is running, there will be a female voice telling you 'waiting for loading data'</li>
-<li>Once the app is loaded, you will be flying from far away to Chicago (animation)</li>
-</ul><h2>
-<a name="the-environment" class="anchor" href="#the-environment"><span class="octicon octicon-link"></span></a>The Environment</h2>
-
-<p>At first you would see:</p>
-
-<ul>
-<li>CTA 'L' Lines in their corresponding colors</li>
-<li>CTA 'L' Stops and their names, except some in Loop</li>
-<li>name of communities followed by number of crimes in that community</li>
-<li>All types of crimes in 2013</li>
-<li>real time feeds of CTA trains (the higher side is where they are heading) </li>
-</ul><h2>
-<a name="navigation" class="anchor" href="#navigation"><span class="octicon octicon-link"></span></a>Navigation</h2>
-
-<ul>
-<li>Use the wand to navigate. Keep <strong>Button7</strong> down and move the wand. The camera will transform exactly as your wand moves (translation and rotation). <strong>Note:</strong> try to move wand slowly at first</li>
-<li>If you lost yourself, press <strong>Button5</strong> to reset the scene</li>
-<li>If you are on your laptop, I also implemented navigation, see source code for reference</li>
-</ul><h2>
-<a name="change-background" class="anchor" href="#change-background"><span class="octicon octicon-link"></span></a>Change Background</h2>
-
-<ul>
-<li>As long as the menu is not opened, you can press <strong>ButtonLeft</strong> to change maps in a cycle</li>
-<li>I currently have four maps: mapquestaerial, openstreetmap, yahoo_aerial, and yahoo_map</li>
-</ul><h2>
-<a name="watch-a-community-area" class="anchor" href="#watch-a-community-area"><span class="octicon octicon-link"></span></a>Watch A Community Area</h2>
-
-<ul>
-<li>There are 77 communities in Chicago. Use 'Menu-&gt;Chicago Panel-&gt;WATCH A COMMUNITY' to fly to a particular community area</li>
-<li>There might be short pause before the camera actually moves. This is because the app is drawing boundary for the community</li>
-<li>You will be hearing a female voice responding you while camera moves</li>
-</ul><h2>
-<a name="real-time-simulation" class="anchor" href="#real-time-simulation"><span class="octicon octicon-link"></span></a>Real Time Simulation</h2>
-
-<ul>
-<li>Use 'Menu-&gt;Chicago Panel-&gt;REAL TIME WATCH' to enter or quit simulation mode</li>
-<li>Once you are in simulation mode, use <strong>Button2</strong> to start the simulation. You will see a timer on the center top of the screen</li>
-<li>When the simulation is running, press <strong>Button3</strong> once will pause it, press <strong>Button3</strong> again will stop it</li>
-</ul><h2>
-<a name="filter-crime-data" class="anchor" href="#filter-crime-data"><span class="octicon octicon-link"></span></a>Filter Crime Data</h2>
-
-<ul>
-<li>You can use 'Menu-&gt;Chicago Panel-&gt;FILTER CRIME TYPES/YEARS' to filter crime data shown in the environment</li>
-<li>If <strong>All</strong> is selected, you will not be able to uncheck certain year, please uncheck <strong>All</strong> first</li>
-<li>If you uncheck <strong>All</strong>, it will go back to the status before you checked <strong>All</strong>
-</li>
-</ul><h2>
-<a name="analyze-crime-data" class="anchor" href="#analyze-crime-data"><span class="octicon octicon-link"></span></a>Analyze Crime Data</h2>
-
-<ul>
-<li>You can also check statistical data of crimes in Chicago by 'Menu-&gt;Chicago Panel-&gt;MORE INFO'</li>
-<li>Currently there are three options: hour of day, day of week, season of year</li>
-<li>hour of day: you will see four bars in each community area, representing number of crimes in 12am-6am, 6am-12pm, 12pm-6pm and 6pm-12am respectively</li>
-<li>day of week: you will see seven bars, representing seven days in a week starting from Sunday</li>
-<li>season of year: you will see four bars. They are Jan-Mar, Apr-Jun, Jul-Sep and Oct-Dec</li>
-<li>If the number is greater than 80% of the maximum number, the bar will be red</li>
-<li>If the number is between 60% and 80% of the maximum number, the bar will be orange</li>
-<li>If the number is between 40% and 60% of the maximum number, the bar will be yellow</li>
-<li>If the number is between 20% and 40% of the maximum number, the bar will be green</li>
-<li>If the number is lower than 20% of the maximum number, the bar will be white</li>
-</ul>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Somebody's Watching Me maintained by <a href="https://github.com/joysword">joysword</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
-  </body>
+		<head>
+				<meta charset='utf-8'>
+				<meta http-equiv="X-UA-Compatible" content="chrome=1">
+				<meta name="description" content="Somebody's Watching Me : a python module using omegalib and osgearth to view crime data of Chicago">
+				<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+				<title>
+						Somebody's Watching Me
+				</title>
+		</head>
+		<body>
+				<!-- HEADER -->
+				<div id="header_wrap" class="outer">
+						<header class="inner">
+								<a id="forkme_banner" href="https://github.com/joysword/cs526.project1" target="_blank">View on GitHub</a>
+								<h1 id="project_title">
+										Somebody's Watching Me
+								</h1>
+								<h2 id="project_tagline">
+										a python module using omegalib and osgearth to view crime data of Chicago
+								</h2>
+								<section id="downloads">
+										<a class="zip_download_link" href="https://github.com/joysword/cs526.project1/zipball/master">Download this project as a .zip file</a> <a class="tar_download_link" href="https://github.com/joysword/cs526.project1/tarball/master">Download this project as a tar.gz file</a>
+								</section>
+						</header>
+				</div>
+				<!-- MAIN CONTENT -->
+				<div id="main_content_wrap" class="outer">
+						<section id="main_content" class="inner">
+								<h1>
+										<a name="welcome" class="anchor" href="#welcome"></a>Welcome!
+								</h1>
+								<p>
+										Welcome to the homepage of my first project of Fall 2013 Semester, Somebody's Watching Me, project 1 of Professor <a href="http://www.evl.uic.edu/aej/">Andy Johnson</a>'s <a href="http://www.evl.uic.edu/aej/526/index.html">Computer Graphics II</a> course.
+								</p>
+								<h3>
+										<a name="introduction" class="anchor" href="#introduction"></a>Introduction
+								</h3>
+								<p>
+									Generally speaking, this app allows you to:
+								</p>
+									<ol>
+											<li>'flying' around whole earth as a 3D interactive environment both in your laptop and in the <a href="http://www.evl.uic.edu/core.php?mod=4&amp;type=1&amp;indi=424">CAVE2</a>
+											</li>
+											<li>switching background between 2 maps and 2 aerial photo versions
+											</li>
+											<li>map the location of crimes in Chicago in recent years on the environment with capability of multiple filters</li>
+											<li>jump to one of the 77 community areas in Chicago fastly</li>
+											<li>analysis crime data per community area as function of the time of day, day of week, or season of year</li>
+											<li>watch the City in 'real-time' as crimes happening</li>
+											<li>see the CTA 'L' lines and realtime location/heading feeds of all the trains</li>
+									</ol>
+								<p>
+									Read <a href="features.html">detailed desciption</a> of all the features of this app.
+								</p>
+								<h3>
+										<a name="download-and-install" class="anchor" href="#download-and-install"></a>Download and Install
+								</h3>
+								<ol>
+										<li>have omegalib and osgearth installed. If you are using Mac, <a href="https://github.com/uic-evl/omegalib/wiki/How-to-run-osgearth-in-omegalib-on-Mac">here</a> is a nice instruction by Victor
+										</li>
+										<li>download the source code from <a href="https://github.com/joysword/cs526.project1/">Github</a> or on top of this page</li>
+										<li>download data files: <a href="http://joysword.com/cs526/data.zip">zip</a> <a href="http://joysword.com/cs526/data.tar.gz">tar.gz</a>, and put them <strong>directly</strong> in the project directory
+										</li>
+										<li>to run the project, do as following:<br><code>$ &gt;cd [omegalib_build]/bin/</code><br>
+												<code>$ &gt;./orun -s [where_you_put_the_project]/shiyin-p1.py</code>
+										</li>
+								</ol>
+								<p><strong>Note:</strong> some scripts in Github repository are not necessary, so you can download source code and data resource all at once <a href="http://joysword.com/cs526/cs526p1_syin.zip">here</a> (zip) or <a href="http://joysword.com/cs526/cs526p1_syin.tar.gz">here</a> (tar.gz)</p>
+								<h3>
+										<a name="about-the-data" class="anchor" href="#about-the-data"></a>About the Data
+								</h3>
+								<p>
+										Data used in this project is coming from different sources, including but not limiting to
+								</p>
+								<ul>
+										<li>
+												<a href="https://data.cityofchicago.org/">City of Chicago Data Portal</a>
+										</li>
+										<li>
+												<a href="http://www.openstreetmap.org/">Open Street Map</a>
+										</li>
+										<li>
+												<a href="http://maps.yahoo.com/">Yahoo! Map</a>
+										</li>
+										<li>
+												<a href="http://osgearth.org/">OSGEARTH</a>
+										</li>
+								</ul>
+								<p>
+										<a href="data.html">More info</a> about the Data
+								</p>
+								<h3>
+										<a name="interesting-findings" class="anchor" href="#interesting-findings"></a>Interesting Findings
+								</h3>
+								<p>
+										Using this app, we are able to look into the data and discover things. See <a href="findings.html">more info</a> about what I found
+								</p>
+						</section>
+				</div>
+				<!-- FOOTER  -->
+				<div id="footer_wrap" class="outer">
+						<footer class="inner">
+								<p class="copyright">
+										Developed and Maintained by <a href="https://github.com/joysword">Shi Yin</a>
+								</p>
+								<p>
+										Published with <a href="http://pages.github.com">GitHub Pages</a>
+								</p>
+						</footer>
+				</div>
+		</body>
 </html>
